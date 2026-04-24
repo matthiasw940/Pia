@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#fbf2df">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>✦ Toast Atelier — für Pia</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Zen+Maru+Gothic:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #fdf6e8;
+  --cream2: #f8efd4;
+  --warm: #7a5a3a;
+  --panel: rgba(255,248,232,0.88);
+  --border: rgba(180,140,90,0.28);
+  --gold: #c8860a;
+  --text: #4a3420;
+  --muted: #9a7a5a;
+  --accent: #6a8a4a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Zen Maru Gothic','Crimson Pro',serif;
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  background:#f0e8d4;
+}
+
+/* ─── TABLECLOTH BACKGROUND ─── */
+.tablecloth{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-color:#fbf2df;
+  /* Gingham/buffalo-check pattern: cream base with overlapping semi-transparent
+     beige horizontal and vertical bands. Where they cross = darker squares. */
+  background-image:
+    /* horizontal bands of warm beige (every other 80px row) */
+    repeating-linear-gradient(0deg,
+      rgba(212,168,108,0.28) 0,
+      rgba(212,168,108,0.28) 80px,
+      transparent 80px,
+      transparent 160px),
+    /* vertical bands of warm beige */
+    repeating-linear-gradient(90deg,
+      rgba(212,168,108,0.28) 0,
+      rgba(212,168,108,0.28) 80px,
+      transparent 80px,
+      transparent 160px),
+    /* diagonal weave texture */
+    repeating-linear-gradient(45deg,
+      rgba(180,130,70,0.05) 0,
+      rgba(180,130,70,0.05) 1px,
+      transparent 1px,
+      transparent 4px);
+  background-size: 160px 160px, 160px 160px, auto;
+}
+/* subtle linen/weave texture overlay */
+.tablecloth::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23c8a060' opacity='0.15'/%3E%3Ccircle cx='3' cy='3' r='0.4' fill='%23c8a060' opacity='0.15'/%3E%3C/svg%3E");
+  opacity:0.5;
+}
+
+/* ─── SVG FLOWERS (fixed corners) ─── */
+.flowers{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ─── PAGE ─── */
+.page{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 1.2rem 4rem;}
+
+/* ─── HEADER ─── */
+header{text-align:center;padding:2.2rem 1rem 1.4rem;position:relative;}
+.header-tag{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-bottom:0.5rem;opacity:0.7;}
+header h1{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(13px,2.8vw,22px);
+  color:var(--gold);
+  text-shadow:2px 2px 0 rgba(100,60,0,0.2);
+  letter-spacing:2px;line-height:1.8;margin-bottom:0.3rem;
+}
+header p{font-size:13px;color:var(--muted);font-style:italic;letter-spacing:0.5px;}
+.header-ornament{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-top:0.8rem;
+}
+.header-ornament span{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold));opacity:0.5;}
+.header-ornament svg{width:18px;height:18px;opacity:0.6;}
+
+/* ─── MAIN GRID ─── */
+.main-grid{display:grid;grid-template-columns:1fr;gap:1.4rem;align-items:start;margin-top:1rem;max-width:780px;margin-left:auto;margin-right:auto;}
+.preview-wrap{position:static !important;}
+
+/* ─── PANEL ─── */
+.panel{
+  background:var(--panel);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:1.2rem 1.2rem;
+  backdrop-filter:blur(4px);
+  box-shadow:0 4px 24px rgba(140,100,40,0.08),0 1px 4px rgba(140,100,40,0.06);
+}
+.panel-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;color:var(--muted);letter-spacing:1.5px;
+  margin-bottom:1rem;padding-bottom:0.6rem;
+  border-bottom:1px solid var(--border);
+}
+
+/* ─── SLOTS ─── */
+.slots-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+.slots-row::-webkit-scrollbar{height:4px;}
+.slots-row::-webkit-scrollbar-track{background:rgba(200,160,80,0.1);border-radius:2px;}
+.slots-row::-webkit-scrollbar-thumb{background:rgba(200,160,80,0.3);border-radius:2px;}
+
+.slot-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;width:102px;}
+.slot-lbl{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--muted);letter-spacing:0.6px;text-align:center;margin-bottom:2px;}
+
+.arr-btn{
+  width:100%;height:26px;
+  background:rgba(255,248,232,0.7);
+  border:1.5px solid var(--border);
+  border-radius:6px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.14s;color:var(--muted);
+}
+.arr-btn:hover{background:#fff8e8;border-color:var(--gold);color:var(--gold);transform:scale(1.04);}
+.arr-btn:active{transform:scale(0.92);}
+.arr-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+.slot-win{
+  width:100%;height:108px;
+  background:rgba(255,248,232,0.5);
+  border:2px solid var(--border);
+  border-radius:7px;
+  position:relative;overflow:hidden;
+}
+.slot-win.hl{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,134,10,0.12);}
+.si{width:100%;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:absolute;transition:transform 0.22s cubic-bezier(.4,0,.2,1),opacity 0.22s;}
+.si.cur{transform:translateY(0);opacity:1;}
+.si.above{transform:translateY(-108px);opacity:0;}
+.si.below{transform:translateY(108px);opacity:0;}
+.si-art{width:62px;height:52px;display:flex;align-items:center;justify-content:center;}
+.si-name{font-size:8.5px;color:var(--text);text-align:center;line-height:1.2;font-weight:500;}
+.si-sub{font-size:7px;color:var(--muted);font-style:italic;text-align:center;}
+
+/* ─── CONTROLS ─── */
+.controls-row{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;}
+.ctrl-box{background:rgba(255,248,232,0.7);border:1.5px solid var(--border);border-radius:8px;padding:0.65rem 0.85rem;}
+.ctrl-lbl{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--muted);letter-spacing:0.7px;margin-bottom:6px;}
+.qty-row{display:flex;align-items:center;gap:8px;}
+.q-btn{width:28px;height:28px;background:rgba(255,248,232,0.9);border:1.5px solid var(--border);border-radius:5px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;line-height:1;}
+.q-btn:hover{border-color:var(--gold);color:var(--gold);}
+.qty-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--gold);min-width:24px;text-align:center;}
+.coffee-tog{display:flex;align-items:center;gap:8px;cursor:pointer;padding:2px 0;}
+.c-chk{width:22px;height:22px;border:2px solid var(--border);background:rgba(255,248,232,0.8);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.15s;border-radius:4px;}
+.c-chk.on{background:#ffe4a0;border-color:var(--gold);color:#8a5800;}
+.coffee-label{font-size:12px;color:var(--text);font-style:italic;}
+.wish-box{flex:1;min-width:180px;}
+.wish-box textarea{width:100%;background:rgba(255,248,232,0.8);border:1.5px solid var(--border);color:var(--text);font-size:11px;padding:6px 8px;font-family:'Zen Maru Gothic',serif;font-style:italic;resize:none;height:50px;border-radius:5px;outline:none;transition:border-color 0.15s;}
+.wish-box textarea:focus{border-color:var(--gold);}
+.wish-box textarea::placeholder{color:var(--muted);opacity:0.6;}
+
+/* ─── SHELF ─── */
+.shelf-row{display:flex;align-items:center;gap:8px;margin-top:1rem;flex-wrap:wrap;}
+.shelf-btn{font-family:'Press Start 2P',monospace;font-size:6.5px;padding:7px 10px;background:rgba(255,248,232,0.7);border:1.5px dashed rgba(180,140,80,0.4);color:var(--muted);border-radius:6px;cursor:pointer;transition:all 0.13s;}
+.shelf-btn:hover{border-color:var(--gold);color:var(--gold);}
+.shelf-toast{cursor:pointer;border:2px solid rgba(100,160,80,0.3);border-radius:5px;padding:2px;background:rgba(255,248,232,0.7);transition:all 0.15s;}
+.shelf-toast:hover{border-color:var(--gold);transform:translateY(-2px);}
+
+/* ─── ORDER BUTTON ─── */
+.order-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:14px;background:var(--gold);border:2px solid rgba(140,80,0,0.3);color:#fff8e8;cursor:pointer;width:100%;letter-spacing:0.5px;border-radius:8px;transition:all 0.13s;margin-top:1rem;box-shadow:0 3px 12px rgba(200,134,10,0.2);}
+.order-btn:hover{background:#d4920e;transform:scale(1.01);}
+.order-btn:active{transform:scale(0.97);}
+
+/* ─── PREVIEW PANEL ─── */
+.preview-wrap{position:sticky;top:1rem;display:flex;flex-direction:column;align-items:center;gap:10px;}
+
+/* ─── THE SCENE ─── */
+.scene-container{
+  width:100%;
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:0;
+  display:flex;flex-direction:column;align-items:stretch;
+  min-height:420px;
+  position:relative;
+  overflow:hidden;
+  background:#fefcf6;
+}
+/* Bright airy kitchen wall — soft white with warm tint */
+.scene-container::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;height:62%;
+  background:
+    radial-gradient(ellipse at 70% 10%, rgba(255,250,230,0.95), transparent 65%),
+    radial-gradient(ellipse at 20% 30%, rgba(255,245,225,0.7), transparent 60%),
+    linear-gradient(180deg, #fefcf6 0%, #f5ecd8 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* The wooden table — bigger, more prominent like reference */
+.wood-table{
+  position:absolute;
+  top:62%;left:0;right:0;bottom:0;
+  z-index:0;
+  background:
+    /* dark front edge / lip */
+    linear-gradient(180deg,
+      #4a2a10 0%,
+      #6a3a18 2px,
+      #8a5028 4px,
+      transparent 4px),
+    /* horizontal plank seams (3 visible planks) */
+    linear-gradient(180deg,
+      transparent 0,
+      transparent 32%,
+      rgba(50,25,5,0.55) 32%,
+      rgba(50,25,5,0.55) calc(32% + 2px),
+      transparent calc(32% + 2px),
+      transparent 66%,
+      rgba(50,25,5,0.55) 66%,
+      rgba(50,25,5,0.55) calc(66% + 2px),
+      transparent calc(66% + 2px)),
+    /* wood grain — long horizontal streaks */
+    repeating-linear-gradient(180deg,
+      transparent 0,
+      transparent 4px,
+      rgba(70,35,10,0.12) 4px,
+      rgba(70,35,10,0.12) 5px,
+      transparent 5px,
+      transparent 11px),
+    /* knots */
+    radial-gradient(ellipse 60px 8px at 25% 20%, rgba(70,40,15,0.25), transparent),
+    radial-gradient(ellipse 80px 10px at 70% 50%, rgba(60,30,10,0.2), transparent),
+    radial-gradient(ellipse 50px 6px at 40% 80%, rgba(70,40,15,0.22), transparent),
+    /* warm wood gradient */
+    linear-gradient(180deg,
+      #d8a070 0%,
+      #c08858 30%,
+      #a87248 65%,
+      #8a5028 100%);
+  box-shadow: inset 0 1px 0 rgba(255,220,180,0.5);
+}
+.wood-table::before, .wood-table::after { content:none; }
+
+/* WINDOW — large, on the right side, view of greenery (like reference) */
+.scene-window{
+  position:absolute;
+  top:4%; right:4%;
+  width:52%; max-width:300px; height:55%;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Open kitchen shelves on the left */
+/* Full-height wooden shelf unit — extends to bottom, hidden by table */
+.scene-shelves{
+  position:absolute;
+  top:0; bottom:0;
+  left:3%;
+  width:30%; max-width:170px;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* Monet-style painting on wall — below penguin */
+.scene-painting{
+  position:absolute;
+  top:32%; left:37%;
+  width:11%; max-width:72px; height:auto;
+  z-index:1;
+  pointer-events:none;
+  filter: drop-shadow(1px 3px 4px rgba(60,40,20,0.3));
+}
+
+/* "Hab dich lieb!" penguin drawing — hangs above Monet */
+.scene-penguin-frame{
+  position:absolute;
+  top:5%; left:37%;
+  width:11%; max-width:72px; height:auto;
+  z-index:1;
+  pointer-events:none;
+  filter: drop-shadow(2px 4px 5px rgba(60,40,20,0.35));
+}
+
+/* vase with flowers — sits on table at same depth as toast plates */
+.scene-vase{
+  position:absolute;
+  bottom:14%;
+  left:4%;
+  width:110px; height:auto;
+  z-index:2;
+  pointer-events:none;
+}
+
+.scene-content{
+  position:relative;z-index:2;
+  padding:1.4rem 0.6rem 1.6rem;
+  display:flex;flex-direction:column;align-items:center;
+  height:100%;
+  min-height:420px;
+  justify-content:flex-end;
+}
+
+/* Multi-plate row */
+.plates-row{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  width:100%;
+  padding:0 4px;
+}
+
+/* Each plate is its own stage */
+.plate-station{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  animation:popIn 0.4s ease both;
+  position:relative;
+}
+/* darker shadow under plate on the wood */
+.plate-station::after{
+  content:'';
+  position:absolute;
+  bottom:-5px;
+  left:50%;transform:translateX(-50%);
+  width:95%;height:14px;
+  background:radial-gradient(ellipse, rgba(30,15,3,0.55), transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.plate-station-steam{
+  display:flex;gap:8px;height:24px;align-items:flex-end;margin-bottom:0;
+  transition:opacity 0.4s;
+}
+/* hidden steam collapses to zero height so all plates align at the table */
+.plate-station-steam[style*="opacity:0"]{
+  height:0;
+}
+
+/* Toasts — actually touch the plate */
+.toasts-on-plate{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:22px;
+  position:relative;
+  margin-bottom:-6px;
+  z-index:2;
+}
+
+.plate-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;z-index:1;
+}
+.plate-top{
+  background:linear-gradient(180deg, #ffffff 0%, #f5ead0 100%);
+  border:2px solid #a87038;border-radius:50%;
+  position:relative;z-index:2;
+}
+.plate-top::after{
+  content:'';position:absolute;top:3px;left:14%;width:32%;height:5px;
+  background:rgba(255,255,255,0.85);border-radius:3px;
+}
+.plate-body{
+  background:#e8d8b8;border:2px solid #a87038;border-top:none;
+  border-radius:0 0 50% 50%;
+  margin-top:-4px;z-index:1;
+}
+
+/* coffee station — no plate shadow, cup has internal contact shadow */
+.coffee-station::after{
+  display:none;
+}
+
+/* steam strands */
+.st{width:6px;height:20px;background:rgba(220,220,230,0.65);border-radius:50%;opacity:0;}
+.s1{animation:steamRise 2.2s ease-out infinite 0s;}
+.s2{animation:steamRise 2.2s ease-out infinite 0.7s;}
+.s3{animation:steamRise 2.2s ease-out infinite 1.4s;}
+
+/* coffee scene */
+.coffee-outer{display:flex;flex-direction:column;align-items:center;gap:0;animation:coffeeIn 0.5s cubic-bezier(.34,1.56,.64,1) both;}
+.cst{width:5px;height:16px;background:rgba(180,200,220,0.5);border-radius:50%;opacity:0;}
+.cs1{animation:steamRise 1.9s ease-out infinite 0.1s;}
+.cs2{animation:steamRise 1.9s ease-out infinite 0.75s;}
+
+/* labels below */
+.char-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);text-align:center;min-height:16px;line-height:1.7;letter-spacing:0.3px;text-shadow:1px 1px 0 rgba(100,60,0,0.15);}
+.char-sub{font-size:10px;color:var(--muted);font-style:italic;text-align:center;line-height:1.4;min-height:13px;}
+
+/* ─── BOTTOM BAR ─── */
+.bottom-bar{background:rgba(255,248,232,0.7);border-top:1px solid var(--border);padding:0.4rem 1.2rem;display:flex;align-items:center;justify-content:space-between;margin-top:1rem;border-radius:0 0 10px 10px;}
+.bh{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--muted);letter-spacing:0.4px;}
+
+/* ─── COOK VIEW ─── */
+.cook-view{display:none;}
+.cook-view.show{display:block;}
+.order-view{display:block;}
+.order-view.hide{display:none;}
+
+/* ─── RECEIPT (Receiptify-style thermal print) ─── */
+.invoice{
+  background:#fefdfa;
+  color:#1a1a1a;
+  font-family:'Courier New','Lucida Console',monospace;
+  font-size:13px;
+  line-height:1.5;
+  max-width:340px;
+  margin:0 auto 1.2rem;
+  padding:24px 22px 18px;
+  position:relative;
+  animation:invoiceIn 0.5s ease both;
+  /* paper texture: subtle warm tint + crease shadow */
+  background-image:
+    radial-gradient(ellipse at 30% 10%, rgba(0,0,0,0.04), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(0,0,0,0.04), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 22px, rgba(0,0,0,0.012) 22px, rgba(0,0,0,0.012) 23px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.05),
+    0 8px 24px rgba(0,0,0,0.18),
+    0 16px 40px rgba(0,0,0,0.1);
+  /* zigzag torn-paper top and bottom */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    radial-gradient(circle at 8px -3px, transparent 5px, #fff 5.5px) top/16px 8px repeat-x,
+    radial-gradient(circle at 8px calc(100% + 3px), transparent 5px, #fff 5.5px) bottom/16px 8px repeat-x;
+  -webkit-mask-composite: source-in;
+          mask:
+    linear-gradient(#fff 0 0) padding-box,
+    radial-gradient(circle at 8px -3px, transparent 5px, #fff 5.5px) top/16px 8px repeat-x,
+    radial-gradient(circle at 8px calc(100% + 3px), transparent 5px, #fff 5.5px) bottom/16px 8px repeat-x;
+}
+.inv-store{
+  font-family:'Arial Black','Helvetica',sans-serif;
+  font-weight:900;
+  font-size:32px;
+  text-align:center;
+  letter-spacing:1.5px;
+  color:#000;
+  margin-bottom:6px;
+  line-height:1;
+}
+.inv-tagline{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:3px;
+  color:#000;
+  margin-bottom:18px;
+  font-family:'Arial','Helvetica',sans-serif;
+  font-weight:500;
+}
+.inv-divider{
+  border:none;
+  border-top:1px dashed #1a1a1a;
+  margin:8px 0;
+}
+.inv-meta{
+  font-size:11px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  margin:6px 0;
+  line-height:1.6;
+}
+.inv-table-head{
+  display:grid;
+  grid-template-columns:32px 1fr 50px;
+  gap:8px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin:8px 0 4px;
+}
+.inv-table-head .h-amt{text-align:right;}
+.inv-row{
+  display:grid;
+  grid-template-columns:32px 1fr 50px;
+  gap:8px;
+  font-size:11.5px;
+  margin:6px 0;
+  text-transform:uppercase;
+  letter-spacing:0.3px;
+  line-height:1.35;
+}
+.inv-row .r-qty{font-weight:bold;}
+.inv-row .r-amt{text-align:right;white-space:nowrap;}
+.inv-totals{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin:8px 0;
+}
+.inv-totals .t-row{
+  display:flex;
+  justify-content:space-between;
+  margin:4px 0;
+}
+.inv-totals .t-row.grand{
+  font-weight:bold;
+  font-size:14px;
+}
+.inv-card-info{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  line-height:1.7;
+  margin:8px 0;
+}
+.inv-thanks{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin:14px 0 10px;
+  font-family:'Arial','Helvetica',sans-serif;
+}
+.inv-barcode{
+  display:flex;
+  justify-content:center;
+  gap:1px;
+  margin:10px 0 8px;
+  height:50px;
+  align-items:flex-end;
+}
+.inv-barcode span{
+  background:#000;
+  display:inline-block;
+}
+.inv-url{
+  text-align:center;
+  font-size:11px;
+  margin:6px 0;
+  color:#1a1a1a;
+}
+.inv-footer-brand{
+  text-align:center;
+  margin-top:12px;
+  font-family:'Arial','Helvetica',sans-serif;
+  font-weight:bold;
+  font-size:12px;
+  letter-spacing:0.5px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.inv-special-note{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+  font-style:italic;
+  margin:6px 0;
+  padding:4px 0;
+}
+
+.steps-panel{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:1.2rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(140,100,40,0.06);}
+.prog-wrap{margin:0.5rem 0 1rem;}
+.prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;font-style:italic;}
+.prog-bg{height:5px;background:rgba(200,160,80,0.15);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:#6a9a3a;border-radius:3px;transition:width 0.35s ease;}
+.steps-list{list-style:none;}
+.step{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid rgba(180,140,80,0.1);cursor:pointer;border-radius:5px;transition:background 0.1s;}
+.step:last-child{border-bottom:none;}
+.step:hover{background:rgba(200,160,80,0.06);}
+.s-cb{width:18px;height:18px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;background:rgba(255,248,232,0.8);margin-top:1px;transition:all 0.14s;flex-shrink:0;border-radius:4px;}
+.step.done .s-cb{background:#6a9a3a;border-color:#6a9a3a;color:white;}
+.step.done .s-txt{text-decoration:line-through;color:var(--muted);opacity:0.7;}
+.s-ico{font-size:14px;flex-shrink:0;}
+.s-txt{font-size:12px;color:var(--text);line-height:1.5;}
+.back-btn{font-family:'Press Start 2P',monospace;font-size:7.5px;padding:10px;background:transparent;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;width:100%;margin-top:0.5rem;border-radius:7px;transition:all 0.13s;font-family:inherit;letter-spacing:0.3px;}
+.back-btn:hover{border-color:var(--gold);color:var(--gold);}
+.done-card{text-align:center;padding:2rem 1rem;background:var(--panel);border:2px solid var(--gold);border-radius:10px;margin-top:1rem;animation:invoiceIn 0.5s ease both;box-shadow:0 4px 20px rgba(200,134,10,0.1);}
+.done-ico{font-size:50px;display:block;margin-bottom:1rem;animation:floatAnim 2s ease-in-out infinite;}
+.done-h{font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.8vw,12px);color:var(--gold);margin-bottom:0.5rem;line-height:2;letter-spacing:1px;}
+.done-p{font-size:13px;color:var(--muted);font-style:italic;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes swayAnim{0%,100%{transform:rotate(-0.5deg)}50%{transform:rotate(0.5deg)}}
+@keyframes pendulumSwing{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+@keyframes popIn{0%{opacity:0;transform:translateY(-10px) scaleY(0.5)}70%{transform:translateY(1px) scaleY(1.03)}100%{opacity:1;transform:translateY(0) scaleY(1)}}
+@keyframes steamRise{0%{opacity:0;transform:translateY(0) scaleX(1)}40%{opacity:0.5}100%{opacity:0;transform:translateY(-28px) scaleX(1.5)}}
+@keyframes coffeeIn{0%{opacity:0;transform:scale(0.5) translateX(16px)}100%{opacity:1;transform:scale(1) translateX(0)}}
+@keyframes invoiceIn{0%{opacity:0;transform:translateY(16px) scale(0.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.page{animation:pageIn 0.5s ease both;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:rgba(200,160,80,0.1);}
+::-webkit-scrollbar-thumb{background:rgba(200,160,80,0.25);border-radius:3px;}
+
+/* ═══════════════════════════════════════════════
+   MOBILE OPTIMIZATIONS (phones, ≤ 680px)
+   ═══════════════════════════════════════════════ */
+@media (max-width: 680px) {
+  /* Tighter page padding */
+  .page{padding:0 0.6rem 3rem;}
+
+  /* Smaller header on phones */
+  header{padding:1.4rem 0.5rem 1rem;}
+  header h1{font-size:clamp(11px,5vw,16px);letter-spacing:1px;line-height:1.6;}
+  header p{font-size:12px;}
+  .header-tag{font-size:9px;letter-spacing:3px;}
+
+  /* Panel more compact */
+  .panel{padding:0.9rem 0.7rem;}
+  .panel-title{font-size:6px;letter-spacing:1px;margin-bottom:0.7rem;}
+
+  /* Slots: slightly narrower so ~3 fit on screen with horizontal scroll */
+  .slot-col{width:88px;}
+  .slot-win{height:96px;}
+  .si{height:96px;}
+  .si-art{width:54px;height:44px;}
+  .si-name{font-size:8px;}
+  .si-sub{font-size:6.5px;}
+  .slot-lbl{font-size:5px;}
+  .arr-btn{height:28px;}  /* bigger tap target */
+  .arr-btn svg{width:14px;height:14px;}
+
+  /* Controls: stack vertically, full width */
+  .controls-row{flex-direction:column;gap:8px;}
+  .ctrl-box{width:100%;padding:0.7rem 0.8rem;}
+  .wish-box{min-width:auto;}
+  .wish-box textarea{height:44px;font-size:13px;}
+  .ctrl-lbl{font-size:6px;}
+  .qty-row{justify-content:center;gap:14px;}
+  .q-btn{width:36px;height:36px;font-size:18px;}  /* bigger tap target */
+  .qty-val{font-size:16px;min-width:30px;}
+  .coffee-tog{justify-content:center;gap:10px;padding:4px 0;}
+  .c-chk{width:28px;height:28px;font-size:14px;}
+
+  /* Shelf buttons larger tap targets */
+  .shelf-row{flex-direction:column;align-items:stretch;gap:8px;}
+  .shelf-btn{padding:10px 12px;font-size:7px;text-align:center;}
+  #toastShelf{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+
+  /* Order button bigger */
+  .order-btn{padding:16px;font-size:10px;}
+
+  /* Bottom bar: hide nav hints to save space */
+  .bottom-bar{padding:0.4rem 0.8rem;}
+  .bh{font-size:5px;}
+
+  /* Preview scene: smaller but still legible */
+  .scene-container{min-height:300px;}
+  .scene-content{min-height:300px;padding:1rem 0.4rem 1rem;}
+  .scene-vase{width:80px;bottom:12%;}
+  .plate-top{height:12px !important;}
+  .plate-body{height:10px !important;}
+
+  /* Cook view / receipt more mobile friendly */
+  .invoice{padding:20px 18px 14px;font-size:12px;max-width:100%;}
+  .inv-store{font-size:26px;letter-spacing:1px;}
+  .inv-tagline{font-size:10px;letter-spacing:2px;margin-bottom:14px;}
+  .inv-row{font-size:11px;grid-template-columns:28px 1fr 48px;}
+  .inv-table-head{grid-template-columns:28px 1fr 48px;}
+  .steps-panel{padding:0.9rem 0.7rem;}
+  .step{padding:10px 6px;gap:10px;}  /* bigger tap targets */
+  .s-cb{width:22px;height:22px;}
+  .s-txt{font-size:13px;}
+  .s-ico{font-size:16px;}
+
+  /* Character name label smaller */
+  .char-name{font-size:6.5px;letter-spacing:0.2px;}
+  .char-sub{font-size:9px;}
+}
+
+/* Extra small phones (≤ 380px) */
+@media (max-width: 380px) {
+  .page{padding:0 0.4rem 3rem;}
+  .panel{padding:0.7rem 0.5rem;}
+  .slot-col{width:82px;}
+  .slot-win{height:90px;}
+  .si{height:90px;}
+  .si-name{font-size:7.5px;}
+  .scene-container{min-height:260px;}
+  .scene-vase{width:70px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TABLECLOTH -->
+<div class="tablecloth"></div>
+
+<!-- FLOWER BOUQUETS in corners (pure SVG) -->
+<svg class="flowers" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <!-- ── TOP-LEFT BOUQUET ── -->
+  <g transform="translate(0,0)">
+    <!-- stems -->
+    <path d="M60 200 Q55 150 80 110" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q50 160 40 120" stroke="#6a9a44" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q70 160 90 125" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q65 165 55 135" stroke="#4a7a30" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q45 155 30 130" stroke="#6aaa44" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- leaves -->
+    <ellipse cx="52" cy="165" rx="8" ry="4" fill="#6a9a3a" opacity="0.7" transform="rotate(-30,52,165)"/>
+    <ellipse cx="72" cy="158" rx="9" ry="4" fill="#5a8a30" opacity="0.7" transform="rotate(20,72,158)"/>
+    <ellipse cx="45" cy="148" rx="7" ry="3.5" fill="#7aaa44" opacity="0.65" transform="rotate(-45,45,148)"/>
+    <!-- flowers: pink tulips -->
+    <g transform="translate(80,108)">
+      <ellipse cx="0" cy="-8" rx="7" ry="10" fill="#f06090" opacity="0.9"/>
+      <ellipse cx="-5" cy="-6" rx="6" ry="9" fill="#e84878" opacity="0.8"/>
+      <ellipse cx="5" cy="-6" rx="6" ry="9" fill="#f87898" opacity="0.8"/>
+      <circle cx="0" cy="-4" r="3" fill="#ffe0b0" opacity="0.6"/>
+    </g>
+    <!-- daisy -->
+    <g transform="translate(40,118)">
+      <circle cx="0" cy="0" r="5" fill="#fff8e0"/>
+      <circle cx="0" cy="-8" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="8" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="-8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="5" fill="#f5c842"/>
+    </g>
+    <!-- lavender -->
+    <g transform="translate(55,133)">
+      <line x1="0" y1="0" x2="0" y2="-18" stroke="#7a60c0" stroke-width="2"/>
+      <ellipse cx="0" cy="-12" rx="3" ry="5" fill="#9a80e0" opacity="0.8"/>
+      <ellipse cx="0" cy="-20" rx="2.5" ry="4" fill="#8a70d0" opacity="0.8"/>
+    </g>
+    <!-- small rose -->
+    <g transform="translate(90,123)">
+      <circle cx="0" cy="0" r="7" fill="#e85070" opacity="0.85"/>
+      <circle cx="0" cy="0" r="5" fill="#f06080" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#ff8098" opacity="0.8"/>
+      <circle cx="0" cy="0" r="1.5" fill="#ffe0e8" opacity="0.9"/>
+    </g>
+    <!-- yellow buttercup -->
+    <g transform="translate(30,128)">
+      <circle cx="0" cy="-7" r="4" fill="#f5d040"/><circle cx="5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="7" cy="0" r="4" fill="#f5d040"/><circle cx="5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="7" r="4" fill="#f5d040"/><circle cx="-5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="-7" cy="0" r="4" fill="#f5d040"/><circle cx="-5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="0" r="4" fill="#e8a820"/>
+    </g>
+    <!-- ribbon bow -->
+    <path d="M50 195 Q45 185 55 185 Q60 180 65 185 Q75 185 70 195" stroke="#e86090" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 185 Q60 178 65 185" stroke="#f080a8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ── TOP-RIGHT BOUQUET ── -->
+  <g transform="translate(1400,0) scale(-1,1)">
+    <path d="M60 200 Q55 150 80 110" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q50 160 40 120" stroke="#6a9a44" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q70 160 90 125" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q65 165 55 135" stroke="#4a7a30" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q45 155 30 130" stroke="#6aaa44" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="52" cy="165" rx="8" ry="4" fill="#6a9a3a" opacity="0.7" transform="rotate(-30,52,165)"/>
+    <ellipse cx="72" cy="158" rx="9" ry="4" fill="#5a8a30" opacity="0.7" transform="rotate(20,72,158)"/>
+    <g transform="translate(80,108)">
+      <ellipse cx="0" cy="-8" rx="7" ry="10" fill="#80c060" opacity="0.9"/>
+      <ellipse cx="-5" cy="-6" rx="6" ry="9" fill="#70b050" opacity="0.8"/>
+      <ellipse cx="5" cy="-6" rx="6" ry="9" fill="#90d070" opacity="0.8"/>
+    </g>
+    <g transform="translate(40,118)">
+      <circle cx="0" cy="0" r="5" fill="#fff8e0"/>
+      <circle cx="0" cy="-8" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="8" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="-8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="5" fill="#f5c842"/>
+    </g>
+    <g transform="translate(55,133)">
+      <line x1="0" y1="0" x2="0" y2="-18" stroke="#9060d0" stroke-width="2"/>
+      <ellipse cx="0" cy="-12" rx="3" ry="5" fill="#b090f0" opacity="0.8"/>
+      <ellipse cx="0" cy="-20" rx="2.5" ry="4" fill="#a080e0" opacity="0.8"/>
+    </g>
+    <g transform="translate(90,123)">
+      <circle cx="0" cy="0" r="7" fill="#60a0e0" opacity="0.85"/>
+      <circle cx="0" cy="0" r="5" fill="#80b8f0" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#a0d0ff" opacity="0.8"/>
+    </g>
+    <g transform="translate(30,128)">
+      <circle cx="0" cy="-7" r="4" fill="#ff9060"/><circle cx="5" cy="-5" r="4" fill="#ff9060"/>
+      <circle cx="7" cy="0" r="4" fill="#ff9060"/><circle cx="5" cy="5" r="4" fill="#ff9060"/>
+      <circle cx="0" cy="7" r="4" fill="#ff9060"/><circle cx="-5" cy="5" r="4" fill="#ff9060"/>
+      <circle cx="-7" cy="0" r="4" fill="#ff9060"/><circle cx="-5" cy="-5" r="4" fill="#ff9060"/>
+      <circle cx="0" cy="0" r="4" fill="#e06020"/>
+    </g>
+    <path d="M50 195 Q45 185 55 185 Q60 180 65 185 Q75 185 70 195" stroke="#e86090" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 185 Q60 178 65 185" stroke="#f080a8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ── BOTTOM-LEFT BOUQUET ── -->
+  <g transform="translate(0,900) scale(1,-1)">
+    <path d="M60 200 Q55 150 80 110" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q50 160 40 120" stroke="#6a9a44" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q70 160 90 125" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q45 155 30 130" stroke="#6aaa44" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="52" cy="165" rx="8" ry="4" fill="#6a9a3a" opacity="0.7" transform="rotate(-30,52,165)"/>
+    <ellipse cx="72" cy="158" rx="9" ry="4" fill="#5a8a30" opacity="0.7" transform="rotate(20,72,158)"/>
+    <g transform="translate(80,108)">
+      <ellipse cx="0" cy="-8" rx="7" ry="10" fill="#d060f0" opacity="0.85"/>
+      <ellipse cx="-5" cy="-6" rx="6" ry="9" fill="#c050e0" opacity="0.8"/>
+      <ellipse cx="5" cy="-6" rx="6" ry="9" fill="#e080ff" opacity="0.8"/>
+      <circle cx="0" cy="-4" r="3" fill="#ffe0f8" opacity="0.6"/>
+    </g>
+    <g transform="translate(40,118)">
+      <circle cx="0" cy="0" r="5" fill="#fff8e0"/>
+      <circle cx="0" cy="-8" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="8" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="-8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="5" fill="#f5c842"/>
+    </g>
+    <g transform="translate(90,123)">
+      <circle cx="0" cy="0" r="7" fill="#f06040" opacity="0.85"/>
+      <circle cx="0" cy="0" r="5" fill="#ff7858" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#ffa090" opacity="0.8"/>
+    </g>
+    <g transform="translate(30,128)">
+      <circle cx="0" cy="-7" r="4" fill="#80e0c0"/><circle cx="5" cy="-5" r="4" fill="#80e0c0"/>
+      <circle cx="7" cy="0" r="4" fill="#80e0c0"/><circle cx="5" cy="5" r="4" fill="#80e0c0"/>
+      <circle cx="0" cy="7" r="4" fill="#80e0c0"/><circle cx="-5" cy="5" r="4" fill="#80e0c0"/>
+      <circle cx="-7" cy="0" r="4" fill="#80e0c0"/><circle cx="-5" cy="-5" r="4" fill="#80e0c0"/>
+      <circle cx="0" cy="0" r="4" fill="#40a880"/>
+    </g>
+    <path d="M50 195 Q45 185 55 185 Q60 180 65 185 Q75 185 70 195" stroke="#80d0a0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 185 Q60 178 65 185" stroke="#a0f0c0" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ── BOTTOM-RIGHT BOUQUET ── -->
+  <g transform="translate(1400,900) scale(-1,-1)">
+    <path d="M60 200 Q55 150 80 110" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q50 160 40 120" stroke="#6a9a44" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q70 160 90 125" stroke="#5a8a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M60 200 Q45 155 30 130" stroke="#6aaa44" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="52" cy="165" rx="8" ry="4" fill="#6a9a3a" opacity="0.7" transform="rotate(-30,52,165)"/>
+    <ellipse cx="72" cy="158" rx="9" ry="4" fill="#5a8a30" opacity="0.7" transform="rotate(20,72,158)"/>
+    <g transform="translate(80,108)">
+      <ellipse cx="0" cy="-8" rx="7" ry="10" fill="#f0a030" opacity="0.9"/>
+      <ellipse cx="-5" cy="-6" rx="6" ry="9" fill="#e09020" opacity="0.8"/>
+      <ellipse cx="5" cy="-6" rx="6" ry="9" fill="#ffb840" opacity="0.8"/>
+    </g>
+    <g transform="translate(40,118)">
+      <circle cx="0" cy="0" r="5" fill="#fff8e0"/>
+      <circle cx="0" cy="-8" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="8" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="-8" cy="0" r="3.5" fill="#fff8e0"/><circle cx="-5.7" cy="-5.7" r="3.5" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="5" fill="#f5c842"/>
+    </g>
+    <g transform="translate(55,133)">
+      <line x1="0" y1="0" x2="0" y2="-18" stroke="#7a60c0" stroke-width="2"/>
+      <ellipse cx="0" cy="-12" rx="3" ry="5" fill="#9a80e0" opacity="0.8"/>
+      <ellipse cx="0" cy="-20" rx="2.5" ry="4" fill="#8a70d0" opacity="0.8"/>
+    </g>
+    <g transform="translate(90,123)">
+      <circle cx="0" cy="0" r="7" fill="#e85070" opacity="0.85"/>
+      <circle cx="0" cy="0" r="5" fill="#f06080" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#ff8098" opacity="0.8"/>
+    </g>
+    <g transform="translate(30,128)">
+      <circle cx="0" cy="-7" r="4" fill="#f5d040"/><circle cx="5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="7" cy="0" r="4" fill="#f5d040"/><circle cx="5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="7" r="4" fill="#f5d040"/><circle cx="-5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="-7" cy="0" r="4" fill="#f5d040"/><circle cx="-5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="0" r="4" fill="#e8a820"/>
+    </g>
+    <path d="M50 195 Q45 185 55 185 Q60 180 65 185 Q75 185 70 195" stroke="#e86090" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 185 Q60 178 65 185" stroke="#f080a8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ── MID-LEFT side cluster ── -->
+  <g transform="translate(20,420)">
+    <path d="M30 80 Q28 50 45 25" stroke="#5a8a3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M30 80 Q35 55 50 35" stroke="#6a9a44" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M30 80 Q22 50 12 30" stroke="#5a8a3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="22" cy="58" rx="6" ry="3" fill="#6a9a3a" opacity="0.65" transform="rotate(-25,22,58)"/>
+    <ellipse cx="38" cy="50" rx="7" ry="3" fill="#5a8a30" opacity="0.65" transform="rotate(20,38,50)"/>
+    <!-- pink rose -->
+    <g transform="translate(45,25)">
+      <circle cx="0" cy="0" r="8" fill="#e85090" opacity="0.9"/>
+      <circle cx="0" cy="0" r="5.5" fill="#ff7098" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#ffb0c8" opacity="0.85"/>
+    </g>
+    <!-- sunflower -->
+    <g transform="translate(50,35)">
+      <circle cx="0" cy="-7" r="4" fill="#f5d040"/><circle cx="5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="7" cy="0" r="4" fill="#f5d040"/><circle cx="5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="7" r="4" fill="#f5d040"/><circle cx="-5" cy="5" r="4" fill="#f5d040"/>
+      <circle cx="-7" cy="0" r="4" fill="#f5d040"/><circle cx="-5" cy="-5" r="4" fill="#f5d040"/>
+      <circle cx="0" cy="0" r="4" fill="#a86810"/>
+    </g>
+    <!-- daisy -->
+    <g transform="translate(12,30)">
+      <circle cx="0" cy="-6" r="3" fill="#fff8e0"/><circle cx="4" cy="-4" r="3" fill="#fff8e0"/>
+      <circle cx="6" cy="0" r="3" fill="#fff8e0"/><circle cx="4" cy="4" r="3" fill="#fff8e0"/>
+      <circle cx="0" cy="6" r="3" fill="#fff8e0"/><circle cx="-4" cy="4" r="3" fill="#fff8e0"/>
+      <circle cx="-6" cy="0" r="3" fill="#fff8e0"/><circle cx="-4" cy="-4" r="3" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="3" fill="#f5c842"/>
+    </g>
+  </g>
+
+  <!-- ── MID-RIGHT side cluster ── -->
+  <g transform="translate(1380,420) scale(-1,1)">
+    <path d="M30 80 Q28 50 45 25" stroke="#5a8a3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M30 80 Q35 55 50 35" stroke="#6a9a44" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M30 80 Q22 50 12 30" stroke="#5a8a3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="22" cy="58" rx="6" ry="3" fill="#6a9a3a" opacity="0.65" transform="rotate(-25,22,58)"/>
+    <ellipse cx="38" cy="50" rx="7" ry="3" fill="#5a8a30" opacity="0.65" transform="rotate(20,38,50)"/>
+    <!-- purple flower -->
+    <g transform="translate(45,25)">
+      <circle cx="0" cy="0" r="8" fill="#9a70d8" opacity="0.9"/>
+      <circle cx="0" cy="0" r="5.5" fill="#b890e8" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#e0c8f8" opacity="0.85"/>
+    </g>
+    <!-- orange daisy -->
+    <g transform="translate(50,35)">
+      <circle cx="0" cy="-7" r="4" fill="#ff9050"/><circle cx="5" cy="-5" r="4" fill="#ff9050"/>
+      <circle cx="7" cy="0" r="4" fill="#ff9050"/><circle cx="5" cy="5" r="4" fill="#ff9050"/>
+      <circle cx="0" cy="7" r="4" fill="#ff9050"/><circle cx="-5" cy="5" r="4" fill="#ff9050"/>
+      <circle cx="-7" cy="0" r="4" fill="#ff9050"/><circle cx="-5" cy="-5" r="4" fill="#ff9050"/>
+      <circle cx="0" cy="0" r="4" fill="#c04818"/>
+    </g>
+    <!-- white daisy -->
+    <g transform="translate(12,30)">
+      <circle cx="0" cy="-6" r="3" fill="#fff8e0"/><circle cx="4" cy="-4" r="3" fill="#fff8e0"/>
+      <circle cx="6" cy="0" r="3" fill="#fff8e0"/><circle cx="4" cy="4" r="3" fill="#fff8e0"/>
+      <circle cx="0" cy="6" r="3" fill="#fff8e0"/><circle cx="-4" cy="4" r="3" fill="#fff8e0"/>
+      <circle cx="-6" cy="0" r="3" fill="#fff8e0"/><circle cx="-4" cy="-4" r="3" fill="#fff8e0"/>
+      <circle cx="0" cy="0" r="3" fill="#f5c842"/>
+    </g>
+  </g>
+
+  <!-- scattered petals — more, distributed around -->
+  <g opacity="0.3">
+    <ellipse cx="200" cy="50" rx="5" ry="3" fill="#f060a0" transform="rotate(30,200,50)"/>
+    <ellipse cx="400" cy="80" rx="4" ry="2.5" fill="#f5c842" transform="rotate(-20,400,80)"/>
+    <ellipse cx="700" cy="40" rx="5" ry="3" fill="#80d0a0" transform="rotate(15,700,40)"/>
+    <ellipse cx="900" cy="70" rx="4" ry="2.5" fill="#e85070" transform="rotate(-35,900,70)"/>
+    <ellipse cx="1100" cy="45" rx="5" ry="3" fill="#a080e0" transform="rotate(25,1100,45)"/>
+    <ellipse cx="180" cy="240" rx="4" ry="2.5" fill="#f5c842" transform="rotate(40,180,240)"/>
+    <ellipse cx="1240" cy="280" rx="4" ry="2.5" fill="#ff9060" transform="rotate(-30,1240,280)"/>
+    <ellipse cx="160" cy="600" rx="5" ry="3" fill="#80d0a0" transform="rotate(60,160,600)"/>
+    <ellipse cx="1260" cy="650" rx="4" ry="2.5" fill="#f060a0" transform="rotate(-50,1260,650)"/>
+    <ellipse cx="250" cy="830" rx="5" ry="3" fill="#f5c842" transform="rotate(-15,250,830)"/>
+    <ellipse cx="600" cy="860" rx="4" ry="2.5" fill="#f060a0" transform="rotate(40,600,860)"/>
+    <ellipse cx="800" cy="850" rx="5" ry="3" fill="#a080e0" transform="rotate(-25,800,850)"/>
+    <ellipse cx="1050" cy="840" rx="5" ry="3" fill="#80d0a0" transform="rotate(-20,1050,840)"/>
+  </g>
+</svg>
+
+<div class="page">
+  <header>
+    <div class="header-tag">✦ Ghibli Edition ✦</div>
+    <h1>Toast Atelier</h1>
+    <p>Pia's persönliches Frühstücks-Studio</p>
+    <div class="header-ornament">
+      <span></span>
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" fill="#c8860a" opacity="0.6"/><circle cx="10" cy="4" r="2" fill="#e85070" opacity="0.5"/><circle cx="16" cy="7" r="2" fill="#f5c842" opacity="0.5"/><circle cx="16" cy="13" r="2" fill="#80d0a0" opacity="0.5"/><circle cx="10" cy="16" r="2" fill="#a080e0" opacity="0.5"/><circle cx="4" cy="13" r="2" fill="#f060a0" opacity="0.5"/><circle cx="4" cy="7" r="2" fill="#80b8f0" opacity="0.5"/></svg>
+      <span style="transform:scaleX(-1)"></span>
+    </div>
+  </header>
+
+  <!-- ORDER VIEW -->
+  <div class="order-view" id="orderView">
+    <div class="main-grid">
+
+      <div>
+        <div class="panel">
+          <div class="panel-title">— Zutaten konfigurieren —</div>
+          <div class="slots-row">
+
+            <div class="slot-col">
+              <div class="slot-lbl">① Brot</div>
+              <button class="arr-btn" onclick="sup('bread')"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div class="slot-win hl" id="sw-bread">
+                <div class="si above" id="sia-bread"><div class="si-art" id="saa-bread"></div><div class="si-name" id="sna-bread"></div></div>
+                <div class="si cur" id="sic-bread"><div class="si-art" id="sac-bread"></div><div class="si-name" id="snc-bread"></div><div class="si-sub" id="ssc-bread"></div></div>
+                <div class="si below" id="sib-bread"><div class="si-art" id="sab-bread"></div><div class="si-name" id="snb-bread"></div></div>
+              </div>
+              <button class="arr-btn" onclick="sdown('bread')"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+
+            <div class="slot-col">
+              <div class="slot-lbl">② Aufstrich</div>
+              <button class="arr-btn" onclick="sup('spread')"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div class="slot-win" id="sw-spread">
+                <div class="si above" id="sia-spread"><div class="si-art" id="saa-spread"></div><div class="si-name" id="sna-spread"></div></div>
+                <div class="si cur" id="sic-spread"><div class="si-art" id="sac-spread"></div><div class="si-name" id="snc-spread"></div><div class="si-sub" id="ssc-spread"></div></div>
+                <div class="si below" id="sib-spread"><div class="si-art" id="sab-spread"></div><div class="si-name" id="snb-spread"></div></div>
+              </div>
+              <button class="arr-btn" onclick="sdown('spread')"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+
+            <div class="slot-col">
+              <div class="slot-lbl">③ Tomate</div>
+              <button class="arr-btn" onclick="sup('tomato')"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div class="slot-win" id="sw-tomato">
+                <div class="si above" id="sia-tomato"><div class="si-art" id="saa-tomato"></div><div class="si-name" id="sna-tomato"></div></div>
+                <div class="si cur" id="sic-tomato"><div class="si-art" id="sac-tomato"></div><div class="si-name" id="snc-tomato"></div><div class="si-sub" id="ssc-tomato"></div></div>
+                <div class="si below" id="sib-tomato"><div class="si-art" id="sab-tomato"></div><div class="si-name" id="snb-tomato"></div></div>
+              </div>
+              <button class="arr-btn" onclick="sdown('tomato')"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+
+            <div class="slot-col">
+              <div class="slot-lbl">④ Schinken</div>
+              <button class="arr-btn" onclick="sup('ham')"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div class="slot-win" id="sw-ham">
+                <div class="si above" id="sia-ham"><div class="si-art" id="saa-ham"></div><div class="si-name" id="sna-ham"></div></div>
+                <div class="si cur" id="sic-ham"><div class="si-art" id="sac-ham"></div><div class="si-name" id="snc-ham"></div><div class="si-sub" id="ssc-ham"></div></div>
+                <div class="si below" id="sib-ham"><div class="si-art" id="sab-ham"></div><div class="si-name" id="snb-ham"></div></div>
+              </div>
+              <button class="arr-btn" onclick="sdown('ham')"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+
+            <div class="slot-col">
+              <div class="slot-lbl">⑤ Ei / Käse</div>
+              <button class="arr-btn" onclick="sup('egg')"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div class="slot-win" id="sw-egg">
+                <div class="si above" id="sia-egg"><div class="si-art" id="saa-egg"></div><div class="si-name" id="sna-egg"></div></div>
+                <div class="si cur" id="sic-egg"><div class="si-art" id="sac-egg"></div><div class="si-name" id="snc-egg"></div><div class="si-sub" id="ssc-egg"></div></div>
+                <div class="si below" id="sib-egg"><div class="si-art" id="sab-egg"></div><div class="si-name" id="snb-egg"></div></div>
+              </div>
+              <button class="arr-btn" onclick="sdown('egg')"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+
+          </div>
+
+          <div class="controls-row">
+            <div class="ctrl-box">
+              <div class="ctrl-lbl">Menge</div>
+              <div class="qty-row">
+                <button class="q-btn" onclick="chQty(-1)">−</button>
+                <span class="qty-val" id="qtyVal">1</span>
+                <button class="q-btn" onclick="chQty(1)">+</button>
+              </div>
+            </div>
+            <div class="ctrl-box">
+              <div class="ctrl-lbl">Getränk</div>
+              <div class="coffee-tog" onclick="togCoffee()">
+                <div class="c-chk" id="coffeeChk"></div>
+                <span class="coffee-label">Kaffee dazu?</span>
+              </div>
+            </div>
+            <div class="ctrl-box wish-box">
+              <div class="ctrl-lbl">Sonderwunsch</div>
+              <textarea id="wishField" placeholder="z.B. extra knusprig, kein Salz..."></textarea>
+            </div>
+          </div>
+
+          <div class="shelf-row">
+            <button class="shelf-btn" onclick="lockCurrent()" id="lockBtn">+ Weiteren Toast konfigurieren</button>
+            <div id="toastShelf"></div>
+          </div>
+
+          <button class="order-btn" onclick="submitOrder()">✦ Bestellung abgeben ✦</button>
+        </div>
+
+        <div class="bottom-bar">
+          <span class="bh">▲▼ Navigieren</span>
+          <span class="bh" id="bName" style="color:var(--gold)">—</span>
+          <span class="bh">✦ OK</span>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-wrap">
+        <div class="panel" style="width:100%;padding:1rem 0.8rem;">
+          <div class="panel-title">— Vorschau —</div>
+
+          <div class="scene-container" id="sceneContainer">
+            <!-- FULL-HEIGHT WOODEN SHELF UNIT — bottom hidden by wood-table -->
+            <svg class="scene-shelves" viewBox="0 0 200 420" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- wood grain pattern reused -->
+              <defs>
+                <pattern id="shelfWood" patternUnits="userSpaceOnUse" width="200" height="8">
+                  <rect width="200" height="8" fill="#a87838"/>
+                  <line x1="0" y1="2" x2="200" y2="2" stroke="#6a4020" stroke-width="0.4" opacity="0.5"/>
+                  <line x1="0" y1="5" x2="200" y2="5" stroke="#8a5828" stroke-width="0.3" opacity="0.4"/>
+                </pattern>
+                <pattern id="shelfWoodSide" patternUnits="userSpaceOnUse" width="14" height="40">
+                  <rect width="14" height="40" fill="#8a5828"/>
+                  <line x1="2" y1="0" x2="2" y2="40" stroke="#5a3818" stroke-width="0.4" opacity="0.6"/>
+                  <line x1="8" y1="0" x2="8" y2="40" stroke="#6a4020" stroke-width="0.3" opacity="0.5"/>
+                  <line x1="12" y1="0" x2="12" y2="40" stroke="#5a3818" stroke-width="0.4" opacity="0.6"/>
+                </pattern>
+                <pattern id="shelfBack" patternUnits="userSpaceOnUse" width="200" height="10">
+                  <rect width="200" height="10" fill="#9a6830"/>
+                  <line x1="0" y1="4" x2="200" y2="4" stroke="#6a4020" stroke-width="0.3" opacity="0.4"/>
+                </pattern>
+              </defs>
+
+              <!-- back panel (wooden) -->
+              <rect x="6" y="0" width="188" height="420" fill="url(#shelfBack)" stroke="#5a3818" stroke-width="1"/>
+
+              <!-- vertical side supports -->
+              <rect x="0" y="0" width="14" height="420" fill="url(#shelfWoodSide)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="186" y="0" width="14" height="420" fill="url(#shelfWoodSide)" stroke="#3a1e08" stroke-width="1"/>
+
+              <!-- TOP DECORATIVE TRIM -->
+              <rect x="0" y="0" width="200" height="12" fill="url(#shelfWood)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="0" y="10" width="200" height="4" fill="#5a3818"/>
+
+              <!-- 4 horizontal shelves (planks) — surfaces at y=86, 176, 266, 356 -->
+              <rect x="0" y="80" width="200" height="8" fill="url(#shelfWood)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="0" y="88" width="200" height="3" fill="#3a1e08" opacity="0.5"/>
+
+              <rect x="0" y="170" width="200" height="8" fill="url(#shelfWood)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="0" y="178" width="200" height="3" fill="#3a1e08" opacity="0.5"/>
+
+              <rect x="0" y="260" width="200" height="8" fill="url(#shelfWood)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="0" y="268" width="200" height="3" fill="#3a1e08" opacity="0.5"/>
+
+              <rect x="0" y="350" width="200" height="8" fill="url(#shelfWood)" stroke="#3a1e08" stroke-width="1"/>
+              <rect x="0" y="358" width="200" height="3" fill="#3a1e08" opacity="0.5"/>
+
+              <!-- ═════════ TOP SHELF (surface y=80, items sit with base at 80) ═════════ -->
+              <!-- stack of books: widths 10, heights vary, all bases at y=80 -->
+              <g>
+                <rect x="22" y="40" width="10" height="40" fill="#6a8a98" stroke="#3a5a68" stroke-width="0.6"/>
+                <rect x="23" y="42" width="8" height="2" fill="#fff8e0" opacity="0.8"/>
+                <rect x="34" y="44" width="10" height="36" fill="#a85050" stroke="#5a2020" stroke-width="0.6"/>
+                <text x="39" y="64" font-size="3" text-anchor="middle" fill="#fff8e0" font-family="serif" transform="rotate(90,39,64)">NOVEL</text>
+                <rect x="46" y="38" width="10" height="42" fill="#88a868" stroke="#486838" stroke-width="0.6"/>
+                <rect x="47" y="40" width="8" height="2" fill="#d8e8c0" opacity="0.8"/>
+                <!-- leaning book -->
+                <g transform="translate(58,80) rotate(-18,0,0)">
+                  <rect x="0" y="-38" width="9" height="38" fill="#d8a848" stroke="#8a6820" stroke-width="0.6"/>
+                  <rect x="1" y="-37" width="7" height="2" fill="#fff8e0" opacity="0.8"/>
+                </g>
+              </g>
+              <!-- potted plant — pot base sits at y=80 -->
+              <g transform="translate(80,0)">
+                <!-- leaves first (above) -->
+                <ellipse cx="4" cy="48" rx="3" ry="6" fill="#6a9830" transform="rotate(-30,4,48)"/>
+                <ellipse cx="16" cy="48" rx="3" ry="6" fill="#7ab040" transform="rotate(30,16,48)"/>
+                <ellipse cx="10" cy="42" rx="3.5" ry="7" fill="#88b848"/>
+                <ellipse cx="7" cy="45" rx="2" ry="4" fill="#a8c860" transform="rotate(-20,7,45)" opacity="0.85"/>
+                <!-- pot (base at y=80) -->
+                <path d="M2 62 L18 62 L16 80 L4 80 Z" fill="#c88858" stroke="#6a4018" stroke-width="0.8"/>
+                <ellipse cx="10" cy="62" rx="8" ry="2" fill="#8a5830" stroke="#6a4018" stroke-width="0.6"/>
+              </g>
+              <!-- candle in holder — base at y=80 -->
+              <g transform="translate(110,0)">
+                <!-- flame on top -->
+                <path d="M8 28 Q6 25 8 22 Q10 25 8 28 Z" fill="#f8a020"/>
+                <ellipse cx="8" cy="25.5" rx="0.8" ry="1.4" fill="#ffe070"/>
+                <!-- wick -->
+                <line x1="8" y1="31" x2="8" y2="28" stroke="#3a2010" stroke-width="0.6"/>
+                <!-- candle -->
+                <rect x="5" y="31" width="6" height="36" fill="#f5e8d0" stroke="#c8a870" stroke-width="0.5"/>
+                <!-- holder -->
+                <rect x="3" y="66" width="10" height="7" rx="1" fill="#e8c068" stroke="#a87830" stroke-width="0.6"/>
+                <path d="M2 73 L14 73 L12 80 L4 80 Z" fill="#c8a048" stroke="#6a4a1a" stroke-width="0.6"/>
+              </g>
+              <!-- framed photo — base at y=80 -->
+              <g transform="translate(140,0)">
+                <rect x="0" y="52" width="24" height="28" fill="#8a5a28" stroke="#3a1e08" stroke-width="0.8"/>
+                <rect x="2" y="54" width="20" height="24" fill="#c8d8e8"/>
+                <circle cx="9" cy="63" r="3" fill="#f5c842"/>
+                <path d="M2 72 Q8 67 14 70 Q20 66 22 69 L22 78 L2 78 Z" fill="#88a860"/>
+              </g>
+
+              <!-- ═════════ SECOND SHELF (surface y=170) ═════════ -->
+              <!-- books stack lying + upright, base at y=170 -->
+              <g>
+                <!-- lying stack (flat books) — heights 10, bottom at 170 -->
+                <rect x="22" y="160" width="32" height="10" fill="#b05848" stroke="#6a2818" stroke-width="0.6"/>
+                <rect x="22" y="167" width="32" height="3" fill="#3a1a08"/>
+                <rect x="24" y="162" width="28" height="2" fill="#fff8e0" opacity="0.7"/>
+                <rect x="22" y="150" width="32" height="10" fill="#6888a8" stroke="#3a5a78" stroke-width="0.6"/>
+                <rect x="22" y="157" width="32" height="3" fill="#2a3a58"/>
+                <!-- upright book on top of stack -->
+                <rect x="58" y="132" width="10" height="38" fill="#88a868" stroke="#486838" stroke-width="0.6"/>
+                <text x="63" y="152" font-size="3" text-anchor="middle" fill="#fff8e0" font-family="serif" transform="rotate(90,63,152)">ART</text>
+              </g>
+              <!-- teacup + saucer — saucer base at y=170 -->
+              <g transform="translate(78,0)">
+                <!-- saucer -->
+                <ellipse cx="14" cy="168" rx="16" ry="2.5" fill="#a89870" opacity="0.4"/>
+                <ellipse cx="14" cy="166" rx="15" ry="2.5" fill="#fafafa" stroke="#b0a890" stroke-width="0.8"/>
+                <ellipse cx="14" cy="164" rx="13" ry="2" fill="#ffffff"/>
+                <!-- cup on saucer -->
+                <path d="M5 152 L23 152 L21 163 Q21 165 18 165 L10 165 Q7 165 7 163 Z" fill="#fafafa" stroke="#b0a890" stroke-width="1"/>
+                <path d="M23 155 Q29 155 29 159 Q29 163 23 163" fill="none" stroke="#b0a890" stroke-width="1.2"/>
+                <ellipse cx="14" cy="152" rx="9" ry="2" fill="#fafafa" stroke="#b0a890" stroke-width="1"/>
+                <ellipse cx="14" cy="152" rx="7.5" ry="1.3" fill="#9a6b3a"/>
+                <text x="14" y="160" font-size="4.5" text-anchor="middle" fill="#e85090" font-family="serif">♥</text>
+              </g>
+              <!-- mason jar with flowers — base at y=170 -->
+              <g transform="translate(118,0)">
+                <!-- flowers above jar -->
+                <line x1="6" y1="150" x2="5" y2="138" stroke="#4a7a20" stroke-width="0.8"/>
+                <circle cx="5" cy="137" r="2" fill="#f8a0c8"/>
+                <circle cx="5" cy="137" r="0.8" fill="#f5d040"/>
+                <line x1="10" y1="150" x2="11" y2="134" stroke="#4a7a20" stroke-width="0.8"/>
+                <circle cx="11" cy="133" r="2" fill="#fff8e0" stroke="#c8a048" stroke-width="0.3"/>
+                <circle cx="11" cy="133" r="0.8" fill="#f5c842"/>
+                <line x1="14" y1="150" x2="15" y2="140" stroke="#4a7a20" stroke-width="0.8"/>
+                <circle cx="15" cy="139" r="1.8" fill="#9060d0"/>
+                <!-- jar body (base at y=170) -->
+                <rect x="0" y="146" width="18" height="24" fill="#d8e8e8" stroke="#7898a0" stroke-width="1" opacity="0.6"/>
+                <rect x="-1" y="144" width="20" height="4" rx="1" fill="#8a7848" stroke="#5a4828" stroke-width="0.6"/>
+                <rect x="2" y="152" width="14" height="16" fill="#b8d0d0" opacity="0.5"/>
+              </g>
+              <!-- wooden bowl of apples — base at y=170 -->
+              <g transform="translate(150,0)">
+                <ellipse cx="10" cy="168" rx="11" ry="2" fill="#6a4a20" opacity="0.4"/>
+                <path d="M0 160 Q0 170 10 170 Q20 170 20 160 Z" fill="#a87838" stroke="#5a3018" stroke-width="0.8"/>
+                <ellipse cx="10" cy="160" rx="10" ry="2.5" fill="#8a5828" stroke="#5a3018" stroke-width="0.8"/>
+                <!-- apples -->
+                <circle cx="6" cy="159" r="2.5" fill="#c83828"/>
+                <circle cx="6" cy="158" r="0.8" fill="#f5c842"/>
+                <circle cx="11" cy="158" r="2.5" fill="#e84830"/>
+                <circle cx="14" cy="160" r="2" fill="#58a818"/>
+              </g>
+
+              <!-- ═════════ THIRD SHELF (surface y=260) ═════════ -->
+              <!-- cookbook — standing upright, base at y=260 -->
+              <g>
+                <rect x="22" y="220" width="38" height="40" fill="#a83838" stroke="#5a1818" stroke-width="1"/>
+                <rect x="24" y="223" width="34" height="34" fill="#c84848"/>
+                <rect x="22" y="220" width="6" height="40" fill="#7a2018"/>
+                <text x="44" y="242" font-size="4" text-anchor="middle" fill="#fff8e0" font-family="serif">COOKING</text>
+                <text x="44" y="248" font-size="3.5" text-anchor="middle" fill="#fff8e0" font-family="serif">RECIPES</text>
+              </g>
+              <!-- stacked plates — base at y=260 -->
+              <g transform="translate(85,0)">
+                <ellipse cx="0" cy="260" rx="26" ry="2.5" fill="#a89870" opacity="0.4"/>
+                <ellipse cx="0" cy="256" rx="26" ry="5" fill="#fafafa" stroke="#b0a890" stroke-width="1"/>
+                <ellipse cx="0" cy="249" rx="26" ry="5" fill="#fafafa" stroke="#b0a890" stroke-width="1"/>
+                <ellipse cx="0" cy="242" rx="26" ry="5" fill="#fafafa" stroke="#b0a890" stroke-width="1"/>
+                <ellipse cx="0" cy="239" rx="22" ry="3.5" fill="#ffffff"/>
+              </g>
+              <!-- big potted plant — pot base at y=260 -->
+              <g transform="translate(140,0)">
+                <!-- leaves above pot -->
+                <ellipse cx="6" cy="220" rx="4" ry="8" fill="#6a9830" transform="rotate(-30,6,220)"/>
+                <ellipse cx="22" cy="220" rx="4" ry="8" fill="#7ab040" transform="rotate(30,22,220)"/>
+                <ellipse cx="14" cy="214" rx="4" ry="9" fill="#88b848"/>
+                <ellipse cx="10" cy="216" rx="2.5" ry="5" fill="#a8c860" transform="rotate(-15,10,216)" opacity="0.85"/>
+                <ellipse cx="18" cy="216" rx="2.5" ry="5" fill="#98c050" transform="rotate(15,18,216)" opacity="0.85"/>
+                <circle cx="14" cy="208" r="2" fill="#f8a0c8"/>
+                <circle cx="14" cy="208" r="0.8" fill="#f5d040"/>
+                <!-- pot (base at y=260) -->
+                <path d="M0 242 L28 242 L25 260 L3 260 Z" fill="#c88858" stroke="#6a4018" stroke-width="0.8"/>
+                <ellipse cx="14" cy="242" rx="14" ry="2.5" fill="#8a5830" stroke="#6a4018" stroke-width="0.6"/>
+              </g>
+
+              <!-- ═════════ FOURTH SHELF (surface y=350, mostly hidden by table) ═════════ -->
+              <!-- baskets / storage boxes -->
+              <g>
+                <rect x="22" y="310" width="40" height="40" fill="#b88848" stroke="#5a3818" stroke-width="0.8"/>
+                <path d="M22 320 L62 320 M22 330 L62 330 M22 340 L62 340" stroke="#5a3818" stroke-width="0.4" opacity="0.6"/>
+                <rect x="22" y="310" width="40" height="5" fill="#8a5828" stroke="#5a3818" stroke-width="0.6"/>
+                <!-- handle -->
+                <path d="M36 310 Q42 306 48 310" stroke="#5a3818" stroke-width="1" fill="none"/>
+              </g>
+              <g transform="translate(72,0)">
+                <!-- larger book row -->
+                <rect x="0" y="320" width="10" height="30" fill="#6a8ab8" stroke="#3a5a88" stroke-width="0.6"/>
+                <rect x="10" y="318" width="10" height="32" fill="#a84838" stroke="#5a1818" stroke-width="0.6"/>
+                <rect x="20" y="322" width="10" height="28" fill="#c8a048" stroke="#6a4a1a" stroke-width="0.6"/>
+                <rect x="30" y="316" width="10" height="34" fill="#588838" stroke="#2a5818" stroke-width="0.6"/>
+                <rect x="40" y="320" width="10" height="30" fill="#7a4878" stroke="#4a1a48" stroke-width="0.6"/>
+              </g>
+              <!-- storage jar -->
+              <g transform="translate(140,0)">
+                <ellipse cx="18" cy="350" rx="18" ry="2" fill="#6a4a20" opacity="0.3"/>
+                <path d="M4 320 Q4 350 18 350 Q32 350 32 320 Q32 314 18 314 Q4 314 4 320 Z" fill="#e8d0a0" stroke="#a87838" stroke-width="0.8"/>
+                <ellipse cx="18" cy="318" rx="14" ry="3" fill="#c8a068" stroke="#a87838" stroke-width="0.8"/>
+                <rect x="8" y="326" width="20" height="8" fill="#fff8e0" opacity="0.4"/>
+                <text x="18" y="334" font-size="4" text-anchor="middle" fill="#8a6830" font-family="serif" font-style="italic">tea</text>
+              </g>
+            </svg>
+
+            <!-- MONET-style "Nymphéas" (water lilies) painting on the wall -->
+            <svg class="scene-painting" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+              <!-- golden ornate frame -->
+              <rect x="0" y="0" width="100" height="80" rx="2" fill="#8a6a30" stroke="#4a2a10" stroke-width="1.5"/>
+              <rect x="3" y="3" width="94" height="74" rx="1" fill="#c8a048" stroke="#6a4a1a" stroke-width="0.8"/>
+              <rect x="6" y="6" width="88" height="68" fill="#e8c068" stroke="#8a6a30" stroke-width="0.5"/>
+              <!-- inner bevel highlight -->
+              <path d="M8 8 L92 8 L90 10 L10 10 Z" fill="#f5d888" opacity="0.7"/>
+              <path d="M8 72 L92 72 L90 70 L10 70 Z" fill="#6a4a1a" opacity="0.6"/>
+
+              <!-- Painting canvas: Monet-style impression of water lilies -->
+              <g clip-path="inset(0)">
+                <!-- water — blue/green/purple dappled reflections -->
+                <rect x="10" y="10" width="80" height="60" fill="#4a78a8"/>
+                <!-- sky reflection streaks -->
+                <path d="M12 14 Q30 12 50 16 Q70 14 88 18" stroke="#b8d4e8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+                <path d="M10 20 Q30 22 50 20 Q70 24 90 22" stroke="#a8c4e0" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <!-- water colour variations — purple/green dabs -->
+                <ellipse cx="22" cy="30" rx="10" ry="3" fill="#6a90c0" opacity="0.6"/>
+                <ellipse cx="60" cy="32" rx="14" ry="3" fill="#5a88b8" opacity="0.6"/>
+                <ellipse cx="40" cy="45" rx="18" ry="4" fill="#7098b8" opacity="0.55"/>
+                <ellipse cx="75" cy="50" rx="12" ry="3" fill="#88b0c8" opacity="0.5"/>
+                <!-- willow-green reflections -->
+                <path d="M14 38 Q22 36 28 40" stroke="#5a8830" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <path d="M60 38 Q68 36 76 40" stroke="#5a8830" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.55"/>
+                <path d="M22 52 Q32 50 42 54" stroke="#6a9840" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+                <!-- purple dabs -->
+                <ellipse cx="30" cy="25" rx="4" ry="1.5" fill="#8070b0" opacity="0.5"/>
+                <ellipse cx="65" cy="58" rx="5" ry="1.5" fill="#9070c0" opacity="0.5"/>
+
+                <!-- water lily pads — oval flat leaves -->
+                <ellipse cx="26" cy="42" rx="9" ry="4" fill="#5a9030" opacity="0.9"/>
+                <ellipse cx="26" cy="42" rx="7" ry="3" fill="#7ab048" opacity="0.8"/>
+                <ellipse cx="52" cy="28" rx="7" ry="3" fill="#6aa038" opacity="0.88"/>
+                <ellipse cx="68" cy="48" rx="9" ry="4" fill="#5a9030" opacity="0.9"/>
+                <ellipse cx="68" cy="48" rx="7" ry="3" fill="#78b048" opacity="0.8"/>
+                <ellipse cx="40" cy="58" rx="10" ry="4" fill="#588830" opacity="0.88"/>
+                <ellipse cx="40" cy="58" rx="8" ry="3" fill="#78a848" opacity="0.75"/>
+                <ellipse cx="18" cy="60" rx="6" ry="2.5" fill="#6a9838" opacity="0.85"/>
+
+                <!-- water lily flowers — pink/white dabs -->
+                <g>
+                  <circle cx="28" cy="40" r="2.2" fill="#ffffff"/>
+                  <circle cx="28" cy="40" r="1.5" fill="#f8c0d0"/>
+                  <circle cx="28" cy="40" r="0.6" fill="#f5d040"/>
+                </g>
+                <g>
+                  <circle cx="66" cy="46" r="2.2" fill="#ffffff"/>
+                  <circle cx="66" cy="46" r="1.5" fill="#f8c0d0"/>
+                  <circle cx="66" cy="46" r="0.6" fill="#f5d040"/>
+                </g>
+                <g>
+                  <circle cx="42" cy="56" r="1.8" fill="#ffc8d8"/>
+                  <circle cx="42" cy="56" r="0.8" fill="#ffffff"/>
+                </g>
+                <g>
+                  <circle cx="53" cy="27" r="1.5" fill="#ffffff"/>
+                  <circle cx="53" cy="27" r="0.8" fill="#f8c0d0"/>
+                </g>
+
+                <!-- small loose brushstrokes for impressionist feel -->
+                <line x1="15" y1="17" x2="19" y2="18" stroke="#d8e8f0" stroke-width="0.8" opacity="0.7"/>
+                <line x1="80" y1="25" x2="85" y2="26" stroke="#d8e8f0" stroke-width="0.8" opacity="0.7"/>
+                <line x1="48" y1="35" x2="54" y2="36" stroke="#b8c8d0" stroke-width="0.6" opacity="0.6"/>
+                <line x1="20" y1="65" x2="26" y2="66" stroke="#a8c0d0" stroke-width="0.6" opacity="0.5"/>
+              </g>
+
+              <!-- signature, barely visible -->
+              <text x="78" y="68" font-size="3" fill="#3a2818" font-family="serif" font-style="italic" opacity="0.7">Monet</text>
+            </svg>
+
+            <!-- PENGUIN "Hab dich lieb!" drawing in chunky wooden frame -->
+            <svg class="scene-penguin-frame" viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg">
+              <!-- chunky wooden outer frame (walnut-like with deep shadow-box look) -->
+              <!-- outer frame dark walnut -->
+              <rect x="0" y="0" width="80" height="110" rx="3" fill="#5a3a18" stroke="#2a1608" stroke-width="1.2"/>
+              <!-- bevelled inner edges with lighter wood highlight on top/left, darker on bottom/right -->
+              <path d="M0 0 L80 0 L74 6 L6 6 Z" fill="#7a5028" opacity="0.9"/>
+              <path d="M0 0 L6 6 L6 104 L0 110 Z" fill="#7a5028" opacity="0.8"/>
+              <path d="M80 0 L80 110 L74 104 L74 6 Z" fill="#3a2010" opacity="0.85"/>
+              <path d="M0 110 L80 110 L74 104 L6 104 Z" fill="#3a2010" opacity="0.9"/>
+
+              <!-- Deep inner cavity (grey-green felt background) -->
+              <rect x="7" y="7" width="66" height="96" fill="#a8a078" stroke="#3a2010" stroke-width="0.6"/>
+
+              <!-- Red-orange card/paper inside frame, slightly smaller -->
+              <rect x="12" y="15" width="56" height="80" fill="#e8503a" stroke="#a82818" stroke-width="0.4"/>
+              <!-- tiny pin hole marks at top of card -->
+              <circle cx="28" cy="19" r="0.7" fill="#3a1a08" opacity="0.6"/>
+              <circle cx="52" cy="19" r="0.7" fill="#3a1a08" opacity="0.6"/>
+
+              <!-- THE PENGUIN (kawaii hand-drawn style, centered on card) -->
+              <g transform="translate(40,50)">
+                <!-- OUTER BODY: thick dark-brown egg/oval outline filled with salmon -->
+                <path d="M-11 0
+                         C-13 -8, -8 -15, 0 -15
+                         C8 -15, 13 -8, 11 0
+                         C12 7, 10 13, 5 15
+                         L-5 15
+                         C-10 13, -12 7, -11 0 Z"
+                      fill="#e87858" stroke="#3a1608" stroke-width="1.3" stroke-linejoin="round"/>
+
+                <!-- DARK HOOD (the black hood wraps around top/back of head with heart-shape dip) -->
+                <path d="M-11 -2
+                         C-12 -9, -8 -14, -3 -14
+                         Q-1 -10 0 -8
+                         Q1 -10 3 -14
+                         C8 -14, 12 -9, 11 -2
+                         C10 0, 9 1, 7 0
+                         C5 -3, 3 -5, 0 -5
+                         C-3 -5, -5 -3, -7 0
+                         C-9 1, -10 0, -11 -2 Z"
+                      fill="#3a1608" stroke="#2a0a04" stroke-width="0.5" stroke-linejoin="round"/>
+
+                <!-- EYES (small round black) -->
+                <circle cx="-3" cy="-3" r="0.9" fill="#2a0a04"/>
+                <circle cx="3" cy="-3" r="0.9" fill="#2a0a04"/>
+
+                <!-- ROSY CHEEKS (small round pink dots) -->
+                <circle cx="-5" cy="-0.5" r="1.2" fill="#c83838" opacity="0.75"/>
+                <circle cx="5" cy="-0.5" r="1.2" fill="#c83838" opacity="0.75"/>
+
+                <!-- BEAK (tiny heart/triangle, orange) -->
+                <path d="M-1.2 -0.5 L1.2 -0.5 L0 1.5 Z" fill="#f5a830" stroke="#a85818" stroke-width="0.4" stroke-linejoin="round"/>
+
+                <!-- LEFT FLIPPER (dark, hangs down-outwards) -->
+                <path d="M-10 2 Q-13 7 -10 11 Q-8 10 -7 6 Z"
+                      fill="#3a1608" stroke="#2a0a04" stroke-width="0.6" stroke-linejoin="round"/>
+
+                <!-- RIGHT FLIPPER (dark, curls forward to hold flower) -->
+                <path d="M8 2 Q12 6 10 11 Q7 11 6 8 Q5 5 6 3 Z"
+                      fill="#3a1608" stroke="#2a0a04" stroke-width="0.6" stroke-linejoin="round"/>
+
+                <!-- FLOWER held by right flipper — stylized 4-petal red flower -->
+                <g transform="translate(5,7)">
+                  <!-- stem (short, dark green) -->
+                  <path d="M0 4 Q0.5 6 0 8" stroke="#2a3818" stroke-width="0.7" fill="none" stroke-linecap="round"/>
+                  <!-- 4 petals (dark red like a painted rose) -->
+                  <ellipse cx="0" cy="-1.5" rx="1.5" ry="2" fill="#8a2010" stroke="#4a0804" stroke-width="0.4"/>
+                  <ellipse cx="-1.8" cy="0.5" rx="2" ry="1.5" fill="#8a2010" stroke="#4a0804" stroke-width="0.4"/>
+                  <ellipse cx="1.8" cy="0.5" rx="2" ry="1.5" fill="#8a2010" stroke="#4a0804" stroke-width="0.4"/>
+                  <ellipse cx="0" cy="2.5" rx="1.5" ry="2" fill="#8a2010" stroke="#4a0804" stroke-width="0.4"/>
+                  <!-- center dot -->
+                  <circle cx="0" cy="0.5" r="0.6" fill="#4a0804"/>
+                </g>
+
+                <!-- TINY FEET (two small orange triangles) -->
+                <path d="M-3 14 L-1 14 L-2 17 Q-2.5 17.5 -3.5 17 L-3 17 Z"
+                      fill="#f5a830" stroke="#a85818" stroke-width="0.4" stroke-linejoin="round"/>
+                <path d="M1 14 L3 14 L3.5 17 Q2.5 17.5 2 17 L1 17 Z"
+                      fill="#f5a830" stroke="#a85818" stroke-width="0.4" stroke-linejoin="round"/>
+                <!-- toe lines -->
+                <line x1="-2.8" y1="15.5" x2="-2.8" y2="16.8" stroke="#a85818" stroke-width="0.3"/>
+                <line x1="-2.2" y1="15.5" x2="-2.2" y2="17" stroke="#a85818" stroke-width="0.3"/>
+                <line x1="2.2" y1="15.5" x2="2.2" y2="17" stroke="#a85818" stroke-width="0.3"/>
+                <line x1="2.8" y1="15.5" x2="2.8" y2="16.8" stroke="#a85818" stroke-width="0.3"/>
+              </g>
+
+              <!-- Handwritten "Hab dich lieb! ♡" text -->
+              <text x="40" y="84" font-size="6.5" fill="#2a1004" text-anchor="middle"
+                    font-family="Brush Script MT, Lucida Handwriting, cursive"
+                    font-style="italic" font-weight="500">Hab dich lieb!</text>
+              <text x="62" y="84" font-size="7" fill="#2a1004" font-family="serif">♡</text>
+            </svg>
+
+
+            <!-- BIG kitchen WINDOW: clean white frame, layered greenery view, cat in tree -->
+            <svg class="scene-window" viewBox="0 0 360 320" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <clipPath id="windowGlass">
+                  <rect x="32" y="22" width="296" height="266"/>
+                </clipPath>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#e8f3f8"/>
+                  <stop offset="60%" stop-color="#dfecdf"/>
+                  <stop offset="100%" stop-color="#cce0ce"/>
+                </linearGradient>
+              </defs>
+
+              <!-- white window frame (outer) -->
+              <rect x="20" y="10" width="320" height="290" rx="6" fill="#fefdfa" stroke="#c8b890" stroke-width="2"/>
+              <rect x="28" y="18" width="304" height="274" rx="3" fill="none" stroke="#d8c8a8" stroke-width="1"/>
+
+              <!-- ====== glass (clipped scene) ====== -->
+              <g clip-path="url(#windowGlass)">
+                <rect x="32" y="22" width="296" height="266" fill="url(#skyGrad)"/>
+
+                <!-- distant foliage layer -->
+                <ellipse cx="80" cy="150" rx="100" ry="60" fill="#c8e0a8" opacity="0.6"/>
+                <ellipse cx="280" cy="160" rx="110" ry="65" fill="#bedaa0" opacity="0.6"/>
+                <ellipse cx="180" cy="180" rx="140" ry="55" fill="#b0d090" opacity="0.55"/>
+
+                <!-- ground line -->
+                <rect x="32" y="270" width="296" height="20" fill="#88a060"/>
+                <path d="M40 270 Q42 264 44 270 Q46 263 48 270 Z" fill="#a8c060"/>
+                <path d="M120 270 Q122 263 124 270 Q126 264 128 270 Z" fill="#9ab458"/>
+                <path d="M240 270 Q242 263 244 270 Q246 264 248 270 Z" fill="#a8c060"/>
+                <path d="M300 270 Q302 264 304 270 Q306 263 308 270 Z" fill="#9ab458"/>
+
+                <!-- TREE — trunk from ground up -->
+                <path d="M158 270 L156 200 Q152 160 150 130 L154 100 L162 100 Q170 130 174 160 Q172 200 168 270 Z"
+                      fill="#7a4a20" stroke="#3a1e08" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M156 250 Q154 200 153 150" stroke="#5a3018" stroke-width="1" fill="none" opacity="0.6"/>
+                <path d="M165 250 Q167 200 169 150" stroke="#a87850" stroke-width="0.8" fill="none" opacity="0.55"/>
+                <ellipse cx="162" cy="270" rx="22" ry="4" fill="#3a1e08" opacity="0.6"/>
+
+                <!-- main horizontal branch (where cat sleeps) -->
+                <path d="M156 130 Q190 122 235 118 Q260 116 290 110"
+                      stroke="#7a4a20" stroke-width="14" fill="none" stroke-linecap="round"/>
+                <path d="M156 130 Q190 122 235 118 Q260 116 290 110"
+                      stroke="#a87850" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.7"/>
+                <path d="M170 134 Q200 128 240 124 Q270 122 290 118"
+                      stroke="#3a1e08" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+                <!-- secondary branches -->
+                <path d="M152 130 Q120 110 90 100" stroke="#7a4a20" stroke-width="9" fill="none" stroke-linecap="round"/>
+                <path d="M152 130 Q120 110 90 100" stroke="#a87850" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.7"/>
+                <path d="M158 100 Q155 70 150 50" stroke="#7a4a20" stroke-width="7" fill="none" stroke-linecap="round"/>
+                <path d="M158 100 Q155 70 150 50" stroke="#a87850" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+                <!-- LEAVES — layered -->
+                <ellipse cx="75" cy="85" rx="32" ry="24" fill="#5a8a30"/>
+                <ellipse cx="115" cy="70" rx="30" ry="22" fill="#5a8a30"/>
+                <ellipse cx="155" cy="55" rx="28" ry="22" fill="#5a8a30"/>
+                <ellipse cx="200" cy="80" rx="34" ry="24" fill="#5a8a30"/>
+                <ellipse cx="245" cy="85" rx="32" ry="22" fill="#5a8a30"/>
+                <ellipse cx="290" cy="80" rx="30" ry="24" fill="#5a8a30"/>
+
+                <ellipse cx="90" cy="95" rx="26" ry="20" fill="#7ab040"/>
+                <ellipse cx="130" cy="85" rx="24" ry="18" fill="#7ab040"/>
+                <ellipse cx="170" cy="75" rx="26" ry="20" fill="#7ab040"/>
+                <ellipse cx="215" cy="95" rx="28" ry="20" fill="#7ab040"/>
+                <ellipse cx="260" cy="100" rx="26" ry="20" fill="#7ab040"/>
+
+                <ellipse cx="100" cy="105" rx="20" ry="14" fill="#9ac860"/>
+                <ellipse cx="145" cy="95" rx="22" ry="14" fill="#9ac860"/>
+                <ellipse cx="190" cy="105" rx="22" ry="14" fill="#9ac860"/>
+                <ellipse cx="240" cy="110" rx="20" ry="14" fill="#9ac860"/>
+                <ellipse cx="285" cy="115" rx="20" ry="14" fill="#9ac860"/>
+
+                <ellipse cx="110" cy="100" rx="8" ry="5" fill="#c8e890" opacity="0.8"/>
+                <ellipse cx="200" cy="100" rx="10" ry="6" fill="#c8e890" opacity="0.75"/>
+                <ellipse cx="270" cy="105" rx="8" ry="5" fill="#c8e890" opacity="0.7"/>
+
+                <!-- cherry blossoms -->
+                <circle cx="105" cy="98" r="3" fill="#f8b8d0"/>
+                <circle cx="135" cy="80" r="2.5" fill="#f8b8d0"/>
+                <circle cx="172" cy="92" r="3" fill="#fcd0e0"/>
+                <circle cx="208" cy="92" r="3" fill="#f8b8d0"/>
+                <circle cx="248" cy="100" r="2.5" fill="#fcd0e0"/>
+                <circle cx="280" cy="108" r="3" fill="#f8b8d0"/>
+                <circle cx="155" cy="62" r="2.5" fill="#fcd0e0"/>
+                <circle cx="220" cy="78" r="2.5" fill="#f8b8d0"/>
+
+                <!-- SLEEPING CAT on the branch (no collar) -->
+                <g transform="translate(220,110)">
+                  <ellipse cx="0" cy="14" rx="42" ry="3" fill="#2a1a08" opacity="0.4"/>
+                  <ellipse cx="0" cy="6" rx="40" ry="14" fill="#ffffff" stroke="#2a2a2a" stroke-width="1.6"/>
+                  <path d="M32 4 Q48 0 46 14 Q40 22 22 18" fill="#ffffff" stroke="#2a2a2a" stroke-width="1.6" stroke-linejoin="round"/>
+                  <circle cx="-30" cy="2" r="16" fill="#ffffff" stroke="#2a2a2a" stroke-width="1.6"/>
+                  <path d="M-40 -7 L-42 -16 L-34 -8 Z" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M-22 -8 L-18 -16 L-24 -6 Z" fill="#ffffff" stroke="#2a2a2a" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M-38 -8 L-38 -12 L-35 -7 Z" fill="#f0a8b0"/>
+                  <path d="M-35 1 Q-32 4 -29 1" stroke="#1a1a1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  <path d="M-27 1 Q-24 4 -21 1" stroke="#1a1a1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  <path d="M-32 6 L-28 6 L-30 9 Z" fill="#e8788a" stroke="#a8485a" stroke-width="0.4"/>
+                  <path d="M-30 9 Q-32 11 -34 10" stroke="#1a1a1a" stroke-width="0.6" fill="none" stroke-linecap="round"/>
+                  <path d="M-30 9 Q-28 11 -26 10" stroke="#1a1a1a" stroke-width="0.6" fill="none" stroke-linecap="round"/>
+                  <line x1="-40" y1="6" x2="-48" y2="4" stroke="#3a3a3a" stroke-width="0.5"/>
+                  <line x1="-40" y1="8" x2="-48" y2="9" stroke="#3a3a3a" stroke-width="0.5"/>
+                  <line x1="-20" y1="6" x2="-12" y2="4" stroke="#3a3a3a" stroke-width="0.5"/>
+                  <line x1="-20" y1="8" x2="-12" y2="9" stroke="#3a3a3a" stroke-width="0.5"/>
+                  <ellipse cx="-12" cy="16" rx="6" ry="4" fill="#ffffff" stroke="#2a2a2a" stroke-width="1.2"/>
+                  <ellipse cx="-14" cy="17" rx="0.8" ry="0.6" fill="#e8788a"/>
+                  <ellipse cx="-12" cy="17" rx="0.8" ry="0.6" fill="#e8788a"/>
+                  <ellipse cx="-10" cy="17" rx="0.8" ry="0.6" fill="#e8788a"/>
+                  <text x="10" y="-8" font-size="14" fill="#3a5018" font-family="Georgia,serif" font-style="italic" font-weight="bold" opacity="0.75">z</text>
+                  <text x="20" y="-18" font-size="18" fill="#3a5018" font-family="Georgia,serif" font-style="italic" font-weight="bold" opacity="0.85">Z</text>
+                  <text x="34" y="-26" font-size="11" fill="#3a5018" font-family="Georgia,serif" font-style="italic" font-weight="bold" opacity="0.6">z</text>
+                </g>
+              </g>
+
+              <!-- white mullions -->
+              <line x1="180" y1="22" x2="180" y2="288" stroke="#fefdfa" stroke-width="8"/>
+              <line x1="180" y1="22" x2="180" y2="288" stroke="#c8b890" stroke-width="0.6"/>
+              <line x1="32" y1="155" x2="328" y2="155" stroke="#fefdfa" stroke-width="8"/>
+              <line x1="32" y1="155" x2="328" y2="155" stroke="#c8b890" stroke-width="0.6"/>
+
+              <!-- ===== CURTAINS ===== -->
+              <!-- curtain rod (above the window frame) -->
+              <line x1="14" y1="14" x2="346" y2="14" stroke="#8a6a30" stroke-width="3.5" stroke-linecap="round"/>
+              <!-- rod finials -->
+              <circle cx="14" cy="14" r="4" fill="#a87830" stroke="#5a3810" stroke-width="0.8"/>
+              <circle cx="346" cy="14" r="4" fill="#a87830" stroke="#5a3810" stroke-width="0.8"/>
+
+              <!-- LEFT CURTAIN — soft pink/cream fabric with vertical folds, pulled back with tie -->
+              <g>
+                <!-- main curtain body -->
+                <path d="M14 14
+                         Q10 60 18 110
+                         Q12 160 22 210
+                         Q16 250 40 270
+                         Q60 260 70 230
+                         Q68 180 62 130
+                         Q66 80 60 30
+                         Q50 18 14 14 Z"
+                      fill="#f5d8c0" stroke="#a87860" stroke-width="1.2"/>
+                <!-- vertical folds (shading) -->
+                <path d="M20 22 Q16 80 22 140 Q18 200 28 260" stroke="#d8a890" stroke-width="2.5" fill="none" opacity="0.55" stroke-linecap="round"/>
+                <path d="M32 22 Q28 80 34 140 Q30 200 42 260" stroke="#d8a890" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <path d="M46 22 Q42 80 48 140 Q44 200 56 260" stroke="#d8a890" stroke-width="2" fill="none" opacity="0.45" stroke-linecap="round"/>
+                <path d="M58 28 Q54 80 60 140 Q56 200 66 250" stroke="#d8a890" stroke-width="1.8" fill="none" opacity="0.4" stroke-linecap="round"/>
+                <!-- highlight folds -->
+                <path d="M26 22 Q22 80 28 140 Q24 200 34 258" stroke="#fff0e0" stroke-width="1" fill="none" opacity="0.55" stroke-linecap="round"/>
+                <path d="M40 22 Q36 80 42 140 Q38 200 50 258" stroke="#fff0e0" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <!-- tie-back ribbon -->
+                <path d="M20 180 Q40 190 60 180 Q56 196 44 200 Q28 196 20 190 Z" fill="#d8788a" stroke="#a84860" stroke-width="1"/>
+                <ellipse cx="42" cy="192" rx="5" ry="2" fill="#e89098" opacity="0.7"/>
+                <!-- bottom hem -->
+                <path d="M16 260 Q30 274 58 266" stroke="#a87860" stroke-width="1.5" fill="none" opacity="0.55"/>
+              </g>
+
+              <!-- RIGHT CURTAIN — mirror of left -->
+              <g>
+                <path d="M346 14
+                         Q350 60 342 110
+                         Q348 160 338 210
+                         Q344 250 320 270
+                         Q300 260 290 230
+                         Q292 180 298 130
+                         Q294 80 300 30
+                         Q310 18 346 14 Z"
+                      fill="#f5d8c0" stroke="#a87860" stroke-width="1.2"/>
+                <path d="M340 22 Q344 80 338 140 Q342 200 332 260" stroke="#d8a890" stroke-width="2.5" fill="none" opacity="0.55" stroke-linecap="round"/>
+                <path d="M328 22 Q332 80 326 140 Q330 200 318 260" stroke="#d8a890" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <path d="M314 22 Q318 80 312 140 Q316 200 304 260" stroke="#d8a890" stroke-width="2" fill="none" opacity="0.45" stroke-linecap="round"/>
+                <path d="M302 28 Q306 80 300 140 Q304 200 294 250" stroke="#d8a890" stroke-width="1.8" fill="none" opacity="0.4" stroke-linecap="round"/>
+                <path d="M334 22 Q338 80 332 140 Q336 200 326 258" stroke="#fff0e0" stroke-width="1" fill="none" opacity="0.55" stroke-linecap="round"/>
+                <path d="M320 22 Q324 80 318 140 Q322 200 310 258" stroke="#fff0e0" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <!-- tie-back ribbon -->
+                <path d="M340 180 Q320 190 300 180 Q304 196 316 200 Q332 196 340 190 Z" fill="#d8788a" stroke="#a84860" stroke-width="1"/>
+                <ellipse cx="318" cy="192" rx="5" ry="2" fill="#e89098" opacity="0.7"/>
+                <!-- bottom hem -->
+                <path d="M344 260 Q330 274 302 266" stroke="#a87860" stroke-width="1.5" fill="none" opacity="0.55"/>
+              </g>
+
+              <!-- VALANCE — fabric swag across the top -->
+              <path d="M14 14 Q60 30 90 22 Q130 30 180 20 Q230 30 270 22 Q300 30 346 14 L346 36 Q300 44 270 40 Q230 46 180 38 Q130 46 90 40 Q60 44 14 36 Z"
+                    fill="#f5d8c0" stroke="#a87860" stroke-width="1.2"/>
+              <!-- valance folds -->
+              <path d="M90 22 Q90 34 90 40" stroke="#d8a890" stroke-width="1.5" fill="none" opacity="0.5"/>
+              <path d="M180 20 Q180 32 180 38" stroke="#d8a890" stroke-width="1.5" fill="none" opacity="0.5"/>
+              <path d="M270 22 Q270 34 270 40" stroke="#d8a890" stroke-width="1.5" fill="none" opacity="0.5"/>
+              <!-- valance tassels -->
+              <circle cx="90" cy="42" r="1.5" fill="#a84860"/>
+              <circle cx="180" cy="40" r="1.5" fill="#a84860"/>
+              <circle cx="270" cy="42" r="1.5" fill="#a84860"/>
+
+              <!-- window sill -->
+              <rect x="14" y="295" width="332" height="14" rx="3" fill="#fefdfa" stroke="#c8b890" stroke-width="1.5"/>
+              <rect x="14" y="307" width="332" height="3" fill="#e8d8b0"/>
+            </svg>
+
+            <div class="wood-table"></div>
+
+            <!-- vase with flowers (sits ON the table, back-left) -->
+            <svg class="scene-vase" viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg">
+              <!-- ===== VASE BODY (drawn FIRST so flowers sit ON TOP) ===== -->
+              <!-- Vase opening is at y=90, body extends to y=190 -->
+              <!-- main bulb -->
+              <path d="M40 90
+                       Q26 100 24 122
+                       Q22 148 32 168
+                       Q40 188 70 188
+                       Q100 188 108 168
+                       Q118 148 116 122
+                       Q114 100 100 90
+                       Q92 86 70 86
+                       Q48 86 40 90 Z"
+                    fill="#5a7a9a"
+                    stroke="#2a3a5a"
+                    stroke-width="2"
+                    stroke-linejoin="round"/>
+              <!-- highlight on left -->
+              <path d="M36 110 Q30 140 36 175" stroke="rgba(255,255,255,0.5)" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <ellipse cx="40" cy="130" rx="3" ry="10" fill="rgba(255,255,255,0.55)"/>
+              <!-- shadow on right -->
+              <path d="M104 110 Q110 140 104 175" stroke="rgba(0,0,0,0.25)" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <!-- decorative band -->
+              <path d="M30 138 Q50 142 70 140 Q90 138 110 140" stroke="#e8d8b0" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <!-- painted flowers on vase -->
+              <circle cx="46" cy="155" r="2.4" fill="#e8a4b8"/>
+              <circle cx="58" cy="162" r="2" fill="#fff8e0"/>
+              <circle cx="70" cy="160" r="2.4" fill="#e8a4b8"/>
+              <circle cx="82" cy="162" r="2" fill="#fff8e0"/>
+              <circle cx="94" cy="155" r="2.4" fill="#e8a4b8"/>
+
+              <!-- ===== VASE NECK / RIM (top of vase, where flowers emerge) ===== -->
+              <ellipse cx="70" cy="90" rx="22" ry="5" fill="#3a5a7a" stroke="#2a3a5a" stroke-width="1.5"/>
+              <ellipse cx="70" cy="88" rx="22" ry="4.5" fill="#7a9aba" stroke="#2a3a5a" stroke-width="1.5"/>
+              <!-- inside (dark hole) -->
+              <ellipse cx="70" cy="89" rx="17" ry="3" fill="#1a2a4a"/>
+
+              <!-- ===== STEMS — emerging FROM the vase opening (y=88) ===== -->
+              <!-- short stems, fanning upward, all start INSIDE the vase neck -->
+              <path d="M70 88 Q68 60 72 30" stroke="#3a6a18" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M68 88 Q56 64 44 38" stroke="#4a7a20" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M72 88 Q82 64 96 40" stroke="#3a6a18" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M62 88 Q48 70 32 56" stroke="#4a7a20" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M78 88 Q92 70 108 56" stroke="#3a6a18" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M65 88 Q58 70 54 56" stroke="#5a8a30" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M75 88 Q82 70 86 56" stroke="#5a8a30" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M58 88 Q48 78 38 72" stroke="#4a7a20" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M82 88 Q92 78 102 72" stroke="#4a7a20" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+              <!-- LEAVES along stems -->
+              <ellipse cx="58" cy="72" rx="6" ry="3" fill="#4a7a20" transform="rotate(-30,58,72)"/>
+              <ellipse cx="82" cy="72" rx="6" ry="3" fill="#3a6a18" transform="rotate(28,82,72)"/>
+              <ellipse cx="48" cy="58" rx="5" ry="2.5" fill="#5a8a30" transform="rotate(-45,48,58)"/>
+              <ellipse cx="92" cy="58" rx="5" ry="2.5" fill="#4a7a20" transform="rotate(45,92,58)"/>
+              <ellipse cx="65" cy="62" rx="5" ry="2.5" fill="#5a8a30" transform="rotate(-15,65,62)"/>
+              <ellipse cx="76" cy="78" rx="5" ry="2" fill="#3a6a18" transform="rotate(20,76,78)"/>
+
+              <!-- ===== FLOWERS — at TOP of stems, forming bouquet above vase ===== -->
+              <!-- center top: pink rose (biggest) -->
+              <g transform="translate(72,30)">
+                <circle cx="0" cy="0" r="11" fill="#e85090" stroke="#a82058" stroke-width="1"/>
+                <circle cx="0" cy="0" r="8" fill="#f070a8"/>
+                <circle cx="0" cy="0" r="5" fill="#ff90c0"/>
+                <circle cx="0" cy="0" r="2.5" fill="#ffd0e0"/>
+                <path d="M-3 -1 Q0 -6 3 -1" stroke="#a82058" stroke-width="0.7" fill="none" opacity="0.6"/>
+              </g>
+
+              <!-- yellow daisy left -->
+              <g transform="translate(44,38)">
+                <circle cx="0" cy="-7" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="5" cy="-5" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="7" cy="0" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="5" cy="5" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="0" cy="7" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="-5" cy="5" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="-7" cy="0" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="-5" cy="-5" r="4" fill="#fff8e0" stroke="#d8c060" stroke-width="0.6"/>
+                <circle cx="0" cy="0" r="4" fill="#f5c842" stroke="#a86810" stroke-width="0.7"/>
+              </g>
+
+              <!-- purple flower right -->
+              <g transform="translate(96,40)">
+                <ellipse cx="0" cy="-6" rx="3.5" ry="5" fill="#9060d0"/>
+                <ellipse cx="5" cy="-2" rx="5" ry="3.5" fill="#a070e0"/>
+                <ellipse cx="5" cy="2" rx="5" ry="3.5" fill="#8050c0"/>
+                <ellipse cx="0" cy="6" rx="3.5" ry="5" fill="#9060d0"/>
+                <ellipse cx="-5" cy="2" rx="5" ry="3.5" fill="#a070e0"/>
+                <ellipse cx="-5" cy="-2" rx="5" ry="3.5" fill="#8050c0"/>
+                <circle cx="0" cy="0" r="2.5" fill="#f5d040"/>
+              </g>
+
+              <!-- white tulip far left -->
+              <g transform="translate(32,56)">
+                <ellipse cx="0" cy="0" rx="5" ry="7" fill="#fff8e8" stroke="#c8a060" stroke-width="0.8"/>
+                <ellipse cx="-2.5" cy="-1" rx="2.5" ry="5" fill="#fdedc8" opacity="0.85"/>
+                <ellipse cx="2.5" cy="-1" rx="2.5" ry="5" fill="#fdedc8" opacity="0.85"/>
+              </g>
+
+              <!-- coral/orange bud far right -->
+              <g transform="translate(108,56)">
+                <circle cx="0" cy="0" r="6" fill="#ff8848"/>
+                <circle cx="0" cy="0" r="4" fill="#ffa868"/>
+                <circle cx="-1" cy="-1" r="2" fill="#ffd0a0"/>
+              </g>
+
+              <!-- two small red poppies between -->
+              <g transform="translate(54,56)">
+                <ellipse cx="-2" cy="-2" rx="3.5" ry="3" fill="#e83830"/>
+                <ellipse cx="2" cy="-2" rx="3.5" ry="3" fill="#d82820"/>
+                <ellipse cx="0" cy="2" rx="4" ry="3" fill="#e83830"/>
+                <circle cx="0" cy="0" r="1.5" fill="#1a1a1a"/>
+              </g>
+              <g transform="translate(86,56)">
+                <ellipse cx="-2" cy="-2" rx="3.5" ry="3" fill="#e83830"/>
+                <ellipse cx="2" cy="-2" rx="3.5" ry="3" fill="#d82820"/>
+                <ellipse cx="0" cy="2" rx="4" ry="3" fill="#e83830"/>
+                <circle cx="0" cy="0" r="1.5" fill="#1a1a1a"/>
+              </g>
+
+              <!-- small lavender accents -->
+              <g transform="translate(38,72)">
+                <ellipse cx="0" cy="-3" rx="2" ry="3" fill="#b090e8"/>
+                <ellipse cx="0" cy="0" rx="2.5" ry="3" fill="#9070d8"/>
+                <ellipse cx="0" cy="3" rx="2" ry="3" fill="#a080e0"/>
+              </g>
+              <g transform="translate(102,72)">
+                <ellipse cx="0" cy="-3" rx="2" ry="3" fill="#b090e8"/>
+                <ellipse cx="0" cy="0" rx="2.5" ry="3" fill="#8050c0"/>
+                <ellipse cx="0" cy="3" rx="2" ry="3" fill="#a080e0"/>
+              </g>
+
+              <!-- baby's breath sprigs -->
+              <g fill="#ffffff" stroke="#d8d8c0" stroke-width="0.4">
+                <circle cx="60" cy="48" r="1.4"/>
+                <circle cx="80" cy="48" r="1.4"/>
+                <circle cx="50" cy="68" r="1.4"/>
+                <circle cx="90" cy="68" r="1.4"/>
+                <circle cx="68" cy="58" r="1.4"/>
+                <circle cx="76" cy="58" r="1.4"/>
+                <circle cx="62" cy="78" r="1.4"/>
+                <circle cx="78" cy="78" r="1.4"/>
+              </g>
+            </svg>
+            <div class="scene-content">
+              <div class="plates-row" id="platesRow"></div>
+            </div>
+          </div>
+
+          <!-- hidden: coffee is now rendered inside the scene -->
+          <div id="coffeeWrap" style="display:none;"></div>
+
+          <div class="char-name" id="charName" style="margin-top:10px;">—</div>
+          <div class="char-sub" id="charSub" style="margin-top:3px;">Wähle deine Zutaten</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COOK VIEW -->
+  <div class="cook-view" id="cookView">
+    <div id="invoiceBox"></div>
+    <div class="steps-panel">
+      <div class="panel-title">— Zubereitungs-Quest —</div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span id="pLbl">0 / 0</span><span id="pPct">0%</span></div>
+        <div class="prog-bg"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+      </div>
+      <ul class="steps-list" id="stepsList"></ul>
+    </div>
+    <div id="doneCard" style="display:none" class="done-card">
+      <span class="done-ico">♡</span>
+      <div class="done-h">Alles fertig!</div>
+      <div class="done-p" id="doneTxt">Guten Appetit, Pia!</div>
+    </div>
+    <button class="back-btn" onclick="resetAll()">← Neue Bestellung</button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const OPTS={
+  bread:[
+    {id:'toast',name:'Toast',sub:'klassisch',
+     art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><rect x="3" y="5" width="58" height="43" rx="10" fill="#D4A860" stroke="#7a4a20" stroke-width="1.8"/><rect x="9" y="11" width="46" height="31" rx="7" fill="#F0D090"/><path d="M12 20 Q32 18 52 20" stroke="#C09040" stroke-width="1.2" fill="none" opacity=".45"/><path d="M12 29 Q32 27 52 29" stroke="#C09040" stroke-width="1.2" fill="none" opacity=".45"/></svg>`},
+    {id:'sunflower',name:'Sonnenblume',sub:'vollkorn',
+     art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><rect x="3" y="5" width="58" height="43" rx="10" fill="#8a5a28" stroke="#4a2e0a" stroke-width="1.8"/><rect x="9" y="11" width="46" height="31" rx="7" fill="#b07838"/><circle cx="17" cy="28" r="4.5" fill="#F5C842" opacity=".9"/><circle cx="30" cy="21" r="4.5" fill="#F5C842" opacity=".9"/><circle cx="44" cy="29" r="4.5" fill="#F5C842" opacity=".9"/><circle cx="23" cy="36" r="3.5" fill="#F5C842" opacity=".8"/></svg>`}
+  ],
+  spread:[
+    {id:'none',name:'Keiner',sub:'—',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><line x1="16" y1="13" x2="48" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="13" x2="16" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+    {id:'butter',name:'Butter',sub:'klassisch',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="24" ry="13" fill="#ffe880" opacity=".85"/><ellipse cx="32" cy="30" rx="18" ry="9" fill="#fff4b0" opacity=".8"/><ellipse cx="28" cy="27" rx="5" ry="2" fill="#ffffff" opacity=".7"/></svg>`},
+    {id:'pesto',name:'Pesto',sub:'basilikum',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="26" ry="15" fill="#4a7820" opacity=".85"/><path d="M10 28 Q22 20 32 26 Q42 20 54 28" fill="none" stroke="#7ab830" stroke-width="2" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="24" r="3" fill="#a8e040" opacity=".6"/></svg>`},
+    {id:'pesto_rosso',name:'Pesto Rosso',sub:'tomate',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="26" ry="15" fill="#a83018" opacity=".88"/><path d="M10 28 Q22 20 32 26 Q42 20 54 28" fill="none" stroke="#d84828" stroke-width="2" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="24" r="3" fill="#e8603a" opacity=".7"/><circle cx="42" cy="32" r="2.5" fill="#f88050" opacity=".6"/></svg>`},
+    {id:'dattel',name:'Dattel',sub:'karamellig',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="24" ry="13" fill="#7a4010" opacity=".88"/><path d="M12 28 Q32 22 52 28" fill="none" stroke="#c88030" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg>`},
+    {id:'walnuss',name:'Walnuss',sub:'herb',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="24" ry="13" fill="#6a4828" opacity=".88"/><path d="M18 26 Q32 18 46 26 Q32 36 18 26Z" fill="#9a7040" opacity=".75"/><circle cx="32" cy="26" r="5.5" fill="#3a2010" opacity=".7"/></svg>`},
+    {id:'guac',name:'Guacamole',sub:'avocado',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="26" ry="15" fill="#4a7828" opacity=".85"/><ellipse cx="32" cy="30" rx="15" ry="9" fill="#88b848" opacity=".8"/><circle cx="32" cy="28" r="6" fill="#6a5020" opacity=".75"/></svg>`}
+  ],
+  tomato:[
+    {id:'none',name:'Keine',sub:'—',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><line x1="16" y1="13" x2="48" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="13" x2="16" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+    {id:'slice',name:'Tomate',sub:'frisch',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="22" ry="14" fill="#c83820" opacity=".9"/><ellipse cx="32" cy="30" rx="16" ry="10" fill="#e84830" opacity=".7"/><line x1="32" y1="18" x2="32" y2="42" stroke="#a82810" stroke-width="1" opacity=".5"/><line x1="20" y1="26" x2="44" y2="34" stroke="#a82810" stroke-width="1" opacity=".4"/><line x1="44" y1="26" x2="20" y2="34" stroke="#a82810" stroke-width="1" opacity=".4"/><circle cx="32" cy="20" r="2" fill="#58a818" opacity=".8"/></svg>`},
+    {id:'many',name:'Tomate ×2',sub:'großzügig',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="22" cy="30" rx="16" ry="12" fill="#c83820" opacity=".85"/><ellipse cx="42" cy="30" rx="16" ry="12" fill="#e84830" opacity=".78"/></svg>`}
+  ],
+  ham:[
+    {id:'no',name:'Kein',sub:'vegetarisch',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><line x1="16" y1="13" x2="48" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="13" x2="16" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+    {id:'yes',name:'Schinken',sub:'herzhaft',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="30" rx="25" ry="13" fill="#d08070" opacity=".9"/><path d="M10 28 Q32 22 54 28" fill="none" stroke="#e8a898" stroke-width="3" stroke-linecap="round" opacity=".5"/><ellipse cx="22" cy="27" rx="8" ry="5" fill="#e8a090" opacity=".5"/></svg>`},
+    {id:'prosciutto',name:'Prosciutto',sub:'italienisch',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><path d="M10 22 Q14 18 20 22 Q26 18 32 24 Q38 20 44 26 Q50 22 54 30 Q48 38 40 34 Q32 40 24 34 Q16 38 10 32 Z" fill="#e8788a" opacity=".9"/><path d="M14 26 Q22 22 30 28 Q38 24 46 30" fill="none" stroke="#d84868" stroke-width="1.5" stroke-linecap="round" opacity=".7"/><path d="M16 32 Q26 28 36 32 Q44 30 50 34" fill="none" stroke="#fff8f0" stroke-width="1.2" stroke-linecap="round" opacity=".6"/><ellipse cx="22" cy="28" rx="3" ry="1.5" fill="#fff8f0" opacity=".5"/><ellipse cx="40" cy="30" rx="3" ry="1.5" fill="#fff8f0" opacity=".5"/></svg>`}
+  ],
+  egg:[
+    {id:'none',name:'Kein Ei',sub:'—',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><line x1="16" y1="13" x2="48" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="13" x2="16" y2="39" stroke="#c8b090" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+    {id:'scr_f',name:'Scrambled',sub:'1 Ei',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="33" rx="25" ry="14" fill="#F0D840" opacity=".95"/><path d="M12 30 Q22 22 32 28 Q42 22 52 30" fill="none" stroke="#C8A020" stroke-width="2.5" stroke-linecap="round" opacity=".55"/></svg>`},
+    {id:'scr_h',name:'Scrambled',sub:'½ Ei',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="33" rx="25" ry="14" fill="#F0D840" opacity=".52"/><text x="46" y="18" font-size="14" fill="#b89000" font-style="italic" font-family="serif">½</text></svg>`},
+    {id:'poch_f',name:'Pochiert',sub:'1 Ei',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="33" rx="23" ry="13" fill="#fff8e8" stroke="#d8c070" stroke-width="1.5"/><circle cx="32" cy="30" r="9" fill="#F0A800"/><circle cx="36" cy="26" r="3" fill="#FFD840" opacity=".65"/></svg>`},
+    {id:'poch_h',name:'Pochiert',sub:'½ Ei',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="32" cy="33" rx="23" ry="13" fill="#fff8e8" stroke="#d8c070" stroke-width="1.5" opacity=".58"/><circle cx="32" cy="30" r="7" fill="#F0A800" opacity=".62"/><text x="46" y="18" font-size="14" fill="#b89000" font-style="italic" font-family="serif">½</text></svg>`},
+    {id:'mozz_f',name:'Mozzarella',sub:'frisch',art:s=>`<svg width="${s}" height="${Math.round(s*.82)}" viewBox="0 0 64 52"><ellipse cx="20" cy="30" rx="11" ry="9" fill="#fdfcf5" stroke="#d8d0b8" stroke-width="1.2"/><ellipse cx="38" cy="26" rx="12" ry="9.5" fill="#ffffff" stroke="#d8d0b8" stroke-width="1.2"/><ellipse cx="48" cy="34" rx="9" ry="7" fill="#fdfcf5" stroke="#d8d0b8" stroke-width="1.2"/><ellipse cx="16" cy="28" rx="3" ry="2" fill="#ffffff" opacity=".8"/><ellipse cx="35" cy="23" rx="3.5" ry="2" fill="#ffffff" opacity=".9"/><ellipse cx="46" cy="32" rx="2.5" ry="1.8" fill="#ffffff" opacity=".8"/></svg>`}
+  ]
+};
+
+const NAMES={
+  toast_pesto_yes:'Il Fornaio Verde',toast_pesto_no:'Pesto Pilgerin',
+  toast_dattel_yes:'Wüsten-Paladin',toast_dattel_no:'Süße Wanderin',
+  toast_walnuss_yes:'Waldhüter',toast_walnuss_no:'Stille Druidin',
+  toast_guac_yes:'Azteken-Krieger',toast_guac_no:'Grüne Elfe',
+  sunflower_pesto_yes:'Garten-Hüter',sunflower_pesto_no:'Blätter-Geist',
+  sunflower_dattel_yes:'Honig-Baron',sunflower_dattel_no:'Süßer Herbst',
+  sunflower_walnuss_yes:'Alter Baum',sunflower_walnuss_no:'Moos-Seele',
+  sunflower_guac_yes:'Jungle-Schamane',sunflower_guac_no:'Freie Natur',
+};
+
+const CATS=['bread','spread','tomato','ham','egg'];
+
+/* ========================================================================
+ * WEB3FORMS CONFIG — sendet Bestellungen per E-Mail ohne dass Pia's
+ * Postfach aufgeht.
+ *
+ * Setup (einmalig, 1 Minute):
+ *   1. https://web3forms.com öffnen
+ *   2. Deine E-Mail-Adresse eintragen → "Create Access Key"
+ *   3. Du bekommst sofort einen Access-Key per E-Mail
+ *   4. Key unten zwischen die Anführungszeichen einfügen
+ *
+ * Kostenlos bis 250 Mails/Monat, kein Account, kein Backend nötig.
+ * ======================================================================== */
+const WEB3FORMS_KEY = 'a20a4524-26af-42c0-a5fa-85e04640d94f';  // ← hier deinen Key einfügen
+const idx={bread:0,spread:0,tomato:0,ham:0,egg:0};
+let qty=1,coffee=false,lockedToasts=[],stepsData=[];
+
+function getItem(cat,i){return OPTS[cat][(i+OPTS[cat].length)%OPTS[cat].length];}
+function cur(cat){return getItem(cat,idx[cat]);}
+
+function renderSlot(cat){
+  [['a',idx[cat]-1],['c',idx[cat]],['b',idx[cat]+1]].forEach(([sfx,i])=>{
+    const item=getItem(cat,i);
+    document.getElementById('sa'+sfx+'-'+cat).innerHTML=item.art(sfx==='c'?58:44);
+    document.getElementById('sn'+sfx+'-'+cat).textContent=item.name;
+    if(sfx==='c')document.getElementById('ssc-'+cat).textContent=item.sub!=='—'?item.sub:'';
+  });
+}
+function sup(cat){idx[cat]=(idx[cat]-1+OPTS[cat].length)%OPTS[cat].length;renderSlot(cat);drawToast();updName();}
+function sdown(cat){idx[cat]=(idx[cat]+1)%OPTS[cat].length;renderSlot(cat);drawToast();updName();}
+function chQty(d){qty=Math.max(1,Math.min(6,qty+d));document.getElementById('qtyVal').textContent=qty;drawToast();updName();}
+
+function togCoffee(){
+  coffee=!coffee;
+  const c=document.getElementById('coffeeChk');c.classList.toggle('on',coffee);c.textContent=coffee?'♡':'';
+  drawToast();updName();
+}
+
+function getConfig(){return{bread:idx.bread,spread:idx.spread,tomato:idx.tomato,ham:idx.ham,egg:idx.egg,qty:qty};}
+
+function lockCurrent(){
+  if(lockedToasts.length>=5)return;
+  lockedToasts.push(getConfig());
+  /* reset qty to 1 for the next toast — independent per plate */
+  qty=1;
+  document.getElementById('qtyVal').textContent='1';
+  renderShelf();drawToast();updName();
+  document.getElementById('lockBtn').textContent=lockedToasts.length>=5?'Max. 5 Toasts':'+ Weiteren Toast konfigurieren';
+}
+function renderShelf(){
+  document.getElementById('toastShelf').innerHTML=lockedToasts.map((cfg,i)=>{
+    const b=OPTS.bread[cfg.bread];
+    const inner=b.id==='sunflower'
+      ?`<rect x="3" y="5" width="58" height="43" rx="10" fill="#8a5a28" stroke="#4a2e0a" stroke-width="1.8"/><circle cx="30" cy="26" r="4" fill="#F5C842"/>`
+      :`<rect x="3" y="5" width="58" height="43" rx="10" fill="#D4A860" stroke="#7a4a20" stroke-width="1.8"/><rect x="9" y="11" width="46" height="31" rx="7" fill="#F0D090"/>`;
+    const qBadge=cfg.qty>1?`<div style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:white;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;">${cfg.qty}</div>`:'';
+    return`<div class="shelf-toast" title="Toast ${i+1} (×${cfg.qty}) — bearbeiten" onclick="editLocked(${i})" style="position:relative;"><svg width="32" height="26" viewBox="0 0 64 52">${inner}</svg>${qBadge}</div>`;
+  }).join('');
+}
+function editLocked(i){
+  const cfg=lockedToasts[i];
+  /* restore qty too — the per-toast value */
+  Object.keys(cfg).forEach(k=>{
+    if(k==='qty'){qty=cfg[k];document.getElementById('qtyVal').textContent=qty;}
+    else{idx[k]=cfg[k];renderSlot(k);}
+  });
+  lockedToasts.splice(i,1);renderShelf();drawToast();updName();
+  document.getElementById('lockBtn').textContent='+ Weiteren Toast konfigurieren';
+}
+
+/* ─── TOAST SVG (side view) ─── */
+function buildToastSVG(cfg,W){
+  const b=OPTS.bread[cfg.bread],sp=OPTS.spread[cfg.spread],tm=OPTS.tomato[cfg.tomato],
+        h=OPTS.ham[cfg.ham],eg=OPTS.egg[cfg.egg];
+  const cx=W/2;
+  const BREAD_H=Math.round(W*0.22);
+  /* total height: bread + layers on top */
+  let layerH=0;
+  const spreadC={butter:'#ffe880',pesto:'#4a7820',pesto_rosso:'#a83018',dattel:'#7a4010',walnuss:'#6a4828',guac:'#4a7828'};
+  const sc=spreadC[sp.id];
+  if(sc)layerH+=Math.round(W*0.09);
+  if(tm.id!=='none')layerH+=Math.round(W*0.08);
+  if(h.id!=='no')layerH+=Math.round(W*0.1);
+  if(eg.id!=='none'){
+    const isMz=eg.id.startsWith('mozz'), isS=eg.id.startsWith('scr');
+    layerH+=Math.round(W*(isMz?0.14:(isS?0.12:0.16)));
+  }
+  const TOTAL_H=BREAD_H+layerH+Math.round(W*0.08); /* +little headroom on top */
+  const bc=b.id==='sunflower'?'#8a5a28':'#D4A860';
+  const bL=b.id==='sunflower'?'#b07838':'#F0D090';
+  const bD=b.id==='sunflower'?'#4a2e0a':'#7a4a20';
+  /* bread sits at the very BOTTOM of viewBox */
+  const breadTop=TOTAL_H-BREAD_H;
+  let svg=`<svg width="${W}" height="${TOTAL_H}" viewBox="0 0 ${W} ${TOTAL_H}" style="display:block;">`;
+  /* bread body — rounded bottom corners */
+  svg+=`<g style="animation:popIn .35s both">`;
+  const r = Math.max(2, Math.round(W*0.06));
+  svg+=`<path d="M0 ${breadTop} L${W} ${breadTop} L${W} ${TOTAL_H-r} Q${W} ${TOTAL_H} ${W-r} ${TOTAL_H} L${r} ${TOTAL_H} Q0 ${TOTAL_H} 0 ${TOTAL_H-r} Z" fill="${bc}" stroke="${bD}" stroke-width="1.5" stroke-linejoin="round"/>`;
+  /* bread top face (ellipse) */
+  svg+=`<ellipse cx="${cx}" cy="${breadTop}" rx="${W/2}" ry="${W*0.06}" fill="${bc}" stroke="${bD}" stroke-width="1.2"/>`;
+  svg+=`<ellipse cx="${cx}" cy="${breadTop}" rx="${W/2-W*0.12}" ry="${W*0.04}" fill="${bL}" opacity=".9"/>`;
+  if(b.id==='sunflower'){
+    for(let i=0;i<4;i++)svg+=`<circle cx="${W*0.14+i*W*0.25}" cy="${breadTop+BREAD_H*0.55}" r="${W*0.045}" fill="#F5C842" opacity=".85"/>`;
+  }else{
+    svg+=`<path d="M${W*0.1} ${breadTop+BREAD_H*0.42} Q${cx} ${breadTop+BREAD_H*0.36} ${W*0.9} ${breadTop+BREAD_H*0.42}" fill="none" stroke="${bD}" stroke-width=".8" opacity=".2"/>`;
+    svg+=`<path d="M${W*0.1} ${breadTop+BREAD_H*0.7} Q${cx} ${breadTop+BREAD_H*0.64} ${W*0.9} ${breadTop+BREAD_H*0.7}" fill="none" stroke="${bD}" stroke-width=".8" opacity=".2"/>`;
+  }
+  svg+=`</g>`;
+  /* layers stacked upward from breadTop */
+  let y=breadTop;
+  if(sc){const lh=Math.round(W*0.09);y-=lh;const d=0.06;
+    svg+=`<g style="animation:popIn .35s ${d}s both"><rect x="1" y="${y}" width="${W-2}" height="${lh}" fill="${sc}" opacity=".9"/><ellipse cx="${cx}" cy="${y}" rx="${W/2-1}" ry="${W*0.05}" fill="${sc}" opacity=".95"/><path d="M${W*0.14} ${y} Q${cx} ${y-W*0.07} ${W*0.86} ${y}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5" stroke-linecap="round"/></g>`;}
+  if(tm.id!=='none'){const lh=Math.round(W*0.08);y-=lh;const d=0.1;
+    svg+=`<g style="animation:popIn .35s ${d}s both"><rect x="2" y="${y}" width="${W-4}" height="${lh}" fill="#c03020" opacity=".88"/><ellipse cx="${cx}" cy="${y}" rx="${W/2-2}" ry="${W*0.05}" fill="#e04030" stroke="#a02010" stroke-width=".8"/></g>`;}
+  if(h.id!=='no'){const lh=Math.round(W*0.1);y-=lh;const d=0.13;
+    const isProsc = h.id==='prosciutto';
+    const hamFill = isProsc ? '#e8788a' : '#d08070';
+    const hamTop = isProsc ? '#f098a8' : '#d89080';
+    const hamStroke = isProsc ? '#b04860' : '#b06050';
+    svg+=`<g style="animation:popIn .35s ${d}s both"><rect x="1" y="${y}" width="${W-2}" height="${lh}" fill="${hamFill}" opacity=".92"/><ellipse cx="${cx}" cy="${y}" rx="${W/2-1}" ry="${W*0.055}" fill="${hamTop}" stroke="${hamStroke}" stroke-width=".8"/>`;
+    if(isProsc){
+      /* prosciutto marbling — thin white fatty streaks */
+      svg+=`<path d="M${W*0.1} ${y+lh*0.3} Q${cx} ${y+lh*0.2} ${W*0.9} ${y+lh*0.35}" fill="none" stroke="#fff8f0" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>`;
+      svg+=`<path d="M${W*0.12} ${y+lh*0.65} Q${cx} ${y+lh*0.55} ${W*0.88} ${y+lh*0.7}" fill="none" stroke="#fff8f0" stroke-width="1" stroke-linecap="round" opacity=".5"/>`;
+    }
+    svg+=`</g>`;
+  }
+  if(eg.id!=='none'){
+    const isMz=eg.id.startsWith('mozz'), isS=eg.id.startsWith('scr'), isH=eg.id.endsWith('_h');
+    const lh=Math.round(W*(isMz?0.14:(isS?0.12:0.16)));
+    y-=lh;const d=0.17;
+    /* Half: width half, centered. Full: full width. */
+    const topW = isH ? W/2 : W;
+    const topLeft = isH ? W/4 : 0;
+    const topCx = cx;
+    const topRx = isH ? (W/4 - 1) : (W/2 - 1);
+    svg+=`<g style="animation:popIn .35s ${d}s both">`;
+    if(isMz){
+      /* Mozzarella — creamy white slices / ball cuts with soft shadows */
+      svg+=`<rect x="${topLeft+1}" y="${y}" width="${topW-2}" height="${lh}" fill="#fdfcf5"/>`;
+      svg+=`<ellipse cx="${topCx}" cy="${y}" rx="${topRx}" ry="${W*0.055}" fill="#ffffff" stroke="#d8d0b8" stroke-width=".8"/>`;
+      /* mozzarella ball/slice chunks on top */
+      const nBalls = isH ? 2 : 3;
+      for(let i=0;i<nBalls;i++){
+        const bx = topLeft + (topW/(nBalls+1))*(i+1);
+        const bry = W*0.045 + Math.random()*W*0.01;
+        const brx = W*0.08 + (i%2===0 ? W*0.01 : -W*0.005);
+        svg+=`<ellipse cx="${bx}" cy="${y+W*0.01}" rx="${brx}" ry="${bry}" fill="#ffffff" stroke="#d8d0b8" stroke-width=".7"/>`;
+        /* soft highlight */
+        svg+=`<ellipse cx="${bx-W*0.02}" cy="${y-W*0.005}" rx="${W*0.025}" ry="${W*0.015}" fill="#ffffff" opacity=".9"/>`;
+      }
+    } else if(isS){
+      /* Scrambled — yellow textured layer */
+      svg+=`<rect x="${topLeft+1}" y="${y}" width="${topW-2}" height="${lh}" fill="#F0D840"/>`;
+      svg+=`<ellipse cx="${topCx}" cy="${y}" rx="${topRx}" ry="${W*0.06}" fill="#F5E050" stroke="#C8A020" stroke-width=".8"/>`;
+      const x1 = topLeft + topW * 0.16;
+      const x2 = topLeft + topW * 0.84;
+      svg+=`<path d="M${x1} ${y} Q${topCx-topW*0.16} ${y-W*0.06} ${topCx} ${y} Q${topCx+topW*0.16} ${y-W*0.06} ${x2} ${y}" fill="none" stroke="#C8A020" stroke-width="1" opacity=".5" stroke-linecap="round"/>`;
+    } else {
+      /* Pochiert — white halo + yolk in the center of the egg area */
+      svg+=`<rect x="${topLeft+2}" y="${y}" width="${topW-4}" height="${lh}" fill="#fff8e8"/>`;
+      svg+=`<ellipse cx="${topCx}" cy="${y}" rx="${topRx-1}" ry="${W*0.07}" fill="#fff8e8" stroke="#d8c060" stroke-width=".8"/>`;
+      svg+=`<ellipse cx="${topCx}" cy="${y}" rx="${W*0.13}" ry="${W*0.055}" fill="#F0A800"/>`;
+      svg+=`<ellipse cx="${topCx+W*0.04}" cy="${y-W*0.012}" rx="${W*0.045}" ry="${W*0.03}" fill="#FFD840" opacity=".6"/>`;
+    }
+    svg+=`</g>`;
+  }
+  svg+=`</svg>`;
+  return svg;
+}
+
+function drawToast(){
+  const cfg=getConfig();
+  const allCfgs=[...lockedToasts,cfg];
+  const platesRow=document.getElementById('platesRow');
+
+  /* For each config, render a plate with its OWN qty toasts on it */
+  let html='';
+  allCfgs.forEach((tcfg,plateIdx)=>{
+    const eg=OPTS.egg[tcfg.egg];
+    const hasEgg=eg.id!=='none' && !eg.id.startsWith('mozz');
+    const plateQty=tcfg.qty||1;
+
+    const total=Math.min(plateQty,4);
+    const TOAST_W=Math.min(72, Math.max(48, Math.round(180/total) - 14));
+    const PLATE_W = Math.min(220, total * TOAST_W + (total-1) * 18 + 30);
+    const PLATE_BODY_W = Math.round(PLATE_W * 0.93);
+
+    let toastsHtml='';
+    for(let i=0;i<total;i++){
+      const delay=(plateIdx*0.15)+(i*0.07);
+      toastsHtml+=`<div style="z-index:${i+1};position:relative;animation:popIn .4s ${delay}s both;flex-shrink:0;">${buildToastSVG(tcfg,TOAST_W)}</div>`;
+    }
+
+    html+=`<div class="plate-station" style="animation-delay:${plateIdx*0.1}s">
+      <div class="plate-station-steam" style="opacity:${hasEgg?1:0}">
+        <div class="st s1"></div><div class="st s2"></div><div class="st s3"></div>
+      </div>
+      <div class="toasts-on-plate">${toastsHtml}</div>
+      <div class="plate-wrap">
+        <div class="plate-top" style="width:${PLATE_W}px;height:14px;"></div>
+        <div class="plate-body" style="width:${PLATE_BODY_W}px;height:12px;"></div>
+      </div>
+    </div>`;
+  });
+
+  /* coffee cup — sits on the wooden table, styled after reference image */
+  if(coffee){
+    html+=`<div class="plate-station coffee-station" style="animation-delay:${allCfgs.length*0.1}s;align-self:flex-end;">
+      <!-- wavy steam above cup -->
+      <svg width="28" height="24" viewBox="0 0 50 40" style="display:block;margin-bottom:-2px;overflow:visible;">
+        <path d="M18 38 Q10 30 18 22 Q26 14 18 6 Q14 2 18 -2"
+              stroke="rgba(140,180,190,0.7)" stroke-width="2" fill="none" stroke-linecap="round">
+          <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2.4s" repeatCount="indefinite"/>
+        </path>
+        <path d="M32 38 Q24 30 32 22 Q40 14 32 6 Q28 2 32 -2"
+              stroke="rgba(140,180,190,0.7)" stroke-width="2" fill="none" stroke-linecap="round">
+          <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite"/>
+        </path>
+      </svg>
+
+      <svg width="78" height="79" viewBox="0 0 140 142" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- contact shadow on the table -->
+        <ellipse cx="65" cy="140" rx="46" ry="4" fill="#1a0805" opacity="0.55"/>
+
+        <!-- HANDLE — teal curved ellipse shape -->
+        <path d="M 18 52
+                 Q 2 52 2 82
+                 Q 2 112 22 112
+                 L 22 100
+                 Q 14 100 14 82
+                 Q 14 64 22 64 Z"
+              fill="#3a7a82" stroke="#1a4a52" stroke-width="2" stroke-linejoin="round"/>
+        <!-- handle shadow/depth -->
+        <path d="M 8 82 Q 8 100 20 104 L 20 100 Q 14 98 14 82 Z" fill="#2a5a62" opacity="0.7"/>
+
+        <!-- CUP BODY — teal, slight taper like reference -->
+        <path d="M 20 42
+                 L 110 42
+                 L 108 130
+                 Q 108 140 98 140
+                 L 30 140
+                 Q 20 140 20 130 Z"
+              fill="#3a7a82"
+              stroke="#1a4a52"
+              stroke-width="2.2"
+              stroke-linejoin="round"/>
+
+        <!-- TOP RIM (cup opening) — darker teal band -->
+        <ellipse cx="65" cy="42" rx="45" ry="8" fill="#2a5a62" stroke="#1a4a52" stroke-width="2"/>
+        <!-- COFFEE surface inside -->
+        <ellipse cx="65" cy="42" rx="41" ry="6.5" fill="#9a6b3a"/>
+        <!-- coffee foam/crema highlight -->
+        <ellipse cx="55" cy="40" rx="22" ry="3" fill="#c8986a" opacity="0.85"/>
+        <ellipse cx="72" cy="42" rx="12" ry="2" fill="#e8c898" opacity="0.5"/>
+        <!-- tiny foam bubbles -->
+        <circle cx="48" cy="40" r="1.2" fill="#e8c898" opacity="0.8"/>
+        <circle cx="58" cy="41" r="0.9" fill="#e8c898" opacity="0.7"/>
+        <circle cx="68" cy="40" r="1.1" fill="#e8c898" opacity="0.75"/>
+        <circle cx="78" cy="41" r="0.9" fill="#e8c898" opacity="0.7"/>
+        <circle cx="52" cy="42" r="0.8" fill="#e8c898" opacity="0.6"/>
+        <circle cx="74" cy="43" r="0.9" fill="#e8c898" opacity="0.65"/>
+
+        <!-- LARGE GLOSS HIGHLIGHT on right side (like reference) -->
+        <path d="M 95 56 Q 100 90 92 130" stroke="#7ab0b8" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 94 58 Q 99 90 91 128" stroke="#a0d0d8" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
+
+        <!-- Small gloss highlight on left (subtler) -->
+        <path d="M 28 58 Q 25 85 30 120" stroke="rgba(200,230,232,0.4)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+        <!-- Dark shadow curve on bottom-left for depth -->
+        <path d="M 22 100 Q 26 130 38 138" stroke="rgba(10,30,40,0.35)" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+        <!-- "I ♥ Pia" inscription — centered on cup body -->
+        <text x="60" y="82" font-size="16" fill="#f8e8d0" text-anchor="middle"
+              font-family="Georgia,serif" font-weight="bold" letter-spacing="1">I</text>
+        <text x="60" y="103" font-size="22" fill="#e8a4a8" text-anchor="middle"
+              font-family="Georgia,serif" font-weight="bold">♥</text>
+        <text x="60" y="122" font-size="14" fill="#f8e8d0" text-anchor="middle"
+              font-family="Georgia,serif" font-weight="bold" font-style="italic">Pia</text>
+      </svg>
+    </div>`;
+  }
+
+  platesRow.innerHTML=html;
+}
+
+function updName(){
+  const b=cur('bread'),sp=cur('spread'),h=cur('ham');
+  const key=`${b.id}_${sp.id}_${h.id}`;
+  const name=NAMES[key]||(sp.id==='none'?'Leere Leinwand':'Ghibli Toast');
+  document.getElementById('charName').textContent=name+(qty>1?` ×${qty}`:'')+( coffee?' + ♡':'');
+  document.getElementById('bName').textContent=name;
+  const parts=[b.name,sp.id!=='none'?sp.name:null,cur('tomato').id!=='none'?'Tomate':null,h.id!=='no'?h.name:null,cur('egg').id!=='none'?cur('egg').name:null].filter(Boolean);
+  document.getElementById('charSub').textContent=parts.join(' · ');
+}
+
+function buildSteps(allCfgs,wish){
+  const steps=[];
+  allCfgs.forEach((c,i)=>{
+    const b=OPTS.bread[c.bread],sp=OPTS.spread[c.spread],tm=OPTS.tomato[c.tomato],h=OPTS.ham[c.ham],eg=OPTS.egg[c.egg];
+    const tQty=c.qty||1;
+    const t=allCfgs.length>1?` (Toast ${i+1})`:'';const q=tQty>1?` ×${tQty}`:'';
+    steps.push({e:'🍞',t:`${b.name} toasten${q}${t}`});
+    if(sp.id!=='none'){const m={butter:'Butter aufstreichen',pesto:'Pesto aufstreichen',pesto_rosso:'Pesto Rosso aufstreichen',dattel:'Dattel-Aufstrich auftragen',walnuss:'Walnuss-Aufstrich aufstreichen',guac:'Guacamole aufstreichen'};steps.push({e:'🌿',t:(m[sp.id]||'Aufstrich auftragen')+t});}
+    if(tm.id!=='none')steps.push({e:'🍅',t:'Tomate schneiden & drauflegen'+t});
+    if(h.id!=='no'){
+      if(h.id==='prosciutto'){steps.push({e:'🥩',t:'Prosciutto hauchdünn auflegen'+t});}
+      else{steps.push({e:'🥩',t:'Schinken anwärmen'});steps.push({e:'🥩',t:'Schinken auflegen'+t});}
+    }
+    if(eg.id!=='none'){const isMz=eg.id.startsWith('mozz'),isS=eg.id.startsWith('scr'),isH=eg.id.endsWith('_h');
+      if(isMz){steps.push({e:'🧀',t:'Mozzarella in Scheiben schneiden'});steps.push({e:'🧀',t:'Auf Toast legen'+t});}
+      else if(isS){steps.push({e:'🥚',t:`${isH?'1 Ei':'2 Eier'} verquirlen & würzen`});steps.push({e:'🍳',t:'Cremig rühren & auf Toast'+t});}
+      else{steps.push({e:'💧',t:'Wasser sieden, Essig dazu'});steps.push({e:'🌀',t:`Ei pochieren (3–4 Min.)${isH?' — ½ Ei':''}`});steps.push({e:'🍳',t:'Abtupfen & auf Toast'+t});}}
+  });
+  if(coffee){steps.push({e:'☕',t:'Kaffee aufbrühen'});steps.push({e:'☕',t:"In Pia's Tasse servieren ♡"});}
+  if(wish)steps.push({e:'✎',t:`Sonderwunsch: "${wish}"`});
+  steps.push({e:'✨',t:'Anrichten & mit Liebe servieren ♡'});
+  return steps;
+}
+
+function submitOrder(){
+  const cfg=getConfig();const allCfgs=[...lockedToasts,cfg];
+  const wish=document.getElementById('wishField').value.trim();
+
+  /* Build line items: each plate becomes (qty, name, price-in-kisses) */
+  const items=[];
+  let totalKisses=0, totalQty=0;
+  allCfgs.forEach((c,ti)=>{
+    const b=OPTS.bread[c.bread],sp=OPTS.spread[c.spread],tm=OPTS.tomato[c.tomato],h=OPTS.ham[c.ham],eg=OPTS.egg[c.egg];
+    const tQty=c.qty||1;
+    /* per-toast kiss price */
+    let pricePerToast=0;
+    if(b.id!=='none')pricePerToast+=1;
+    if(sp.id!=='none')pricePerToast+=1;
+    if(tm.id!=='none')pricePerToast+=1;
+    if(h.id!=='no')pricePerToast+=1;
+    if(eg.id!=='none')pricePerToast+=2;
+    /* compose item name */
+    const parts=[b.name];
+    if(sp.id!=='none')parts.push('+ '+sp.name);
+    if(tm.id!=='none')parts.push('+ Tomate');
+    if(h.id!=='no')parts.push('+ '+h.name);
+    if(eg.id!=='none')parts.push('+ '+eg.name+(eg.sub&&eg.sub!=='—'?' ('+eg.sub+')':''));
+    const lineTotal=pricePerToast*tQty;
+    items.push({qty:tQty, name:parts.join(' '), amt:lineTotal});
+    totalKisses+=lineTotal;
+    totalQty+=tQty;
+  });
+  if(coffee){items.push({qty:1, name:"I ♥ Pia Kaffee", amt:2}); totalKisses+=2; totalQty+=1;}
+
+  const pad2=n=>String(n).padStart(2,'0');
+  const orderNum=String(Math.floor(Math.random()*9000)+1000);
+  const authCode=String(Math.floor(Math.random()*900000)+100000);
+  const cardSuffix=String(Math.floor(Math.random()*9000)+1000);
+  const now=new Date();
+  const weekdayLong=now.toLocaleDateString('de-AT',{weekday:'long'}).toUpperCase();
+  const dateLine=`${weekdayLong}, ${now.getDate()}. ${now.toLocaleDateString('de-AT',{month:'long'}).toUpperCase()} ${now.getFullYear()}`;
+  /* random barcode bars */
+  const bars=Array.from({length:50}, ()=>{
+    const w=Math.random()<0.5?1:Math.random()<0.7?2:3;
+    const h=42+Math.floor(Math.random()*8);
+    return `<span style="width:${w}px;height:${h}px;"></span><span style="width:${1+Math.floor(Math.random()*2)}px;height:${h}px;background:transparent;"></span>`;
+  }).join('');
+
+  let inv=`<div class="invoice">
+    <div class="inv-store">RECHNUNG</div>
+    <div class="inv-tagline">PIA'S TOAST ATELIER</div>
+    <hr class="inv-divider">
+    <div class="inv-meta">
+      ORDER #${pad2(orderNum)} FOR PIA<br>
+      ${dateLine}
+    </div>
+    <hr class="inv-divider">
+    <div class="inv-table-head">
+      <span>QTY</span><span>ITEM</span><span class="h-amt">AMT</span>
+    </div>
+    <hr class="inv-divider">`;
+
+  items.forEach(it=>{
+    inv+=`<div class="inv-row">
+      <span class="r-qty">${pad2(it.qty)}</span>
+      <span class="r-item">${it.name.toUpperCase()}</span>
+      <span class="r-amt">${'💋'.repeat(it.amt)||'—'}</span>
+    </div>`;
+  });
+
+  if(wish){
+    inv+=`<hr class="inv-divider">
+    <div class="inv-special-note">★ SONDERWUNSCH:<br>"${wish.toUpperCase()}"</div>`;
+    totalKisses+=1;
+  }
+
+  inv+=`<hr class="inv-divider">
+    <div class="inv-totals">
+      <div class="t-row"><span>ITEM COUNT:</span><span>${totalQty}</span></div>
+      <div class="t-row grand"><span>TOTAL:</span><span>${'💋'.repeat(Math.min(totalKisses,12))}</span></div>
+    </div>
+    <hr class="inv-divider">
+    <div class="inv-card-info">
+      CARD #: **** **** **** ${cardSuffix}<br>
+      AUTH CODE: ${authCode}<br>
+      CARDHOLDER: PIA
+    </div>
+    <hr class="inv-divider">
+    <div class="inv-thanks">DANKE FÜR DEINEN BESUCH!</div>
+    <div class="inv-barcode">${bars}</div>
+    <div class="inv-url">toast-atelier.pia</div>
+    <div class="inv-footer-brand">
+      <span style="font-size:18px;">🍞</span>
+      <span>Toast Atelier</span>
+    </div>
+  </div>`;
+
+  document.getElementById('invoiceBox').innerHTML=inv;
+  stepsData=buildSteps(allCfgs,wish).map(s=>({...s,done:false}));
+  renderSteps();
+  document.getElementById('orderView').classList.add('hide');
+  document.getElementById('cookView').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  /* ── Send order via Web3Forms (no email client needed) ───────────── */
+  try{
+    const subject = `Pia's Frühstücks-Bestellung — ${now.toLocaleDateString('de-AT')}`;
+    const lines = [];
+    lines.push(`🍞 PIA'S TOAST ATELIER — BESTELLUNG`);
+    lines.push(`Datum: ${now.toLocaleString('de-AT')}`);
+    lines.push(`Bestellung Nr.: #${orderNum}`);
+    lines.push(``);
+    lines.push(`──────────────────────────────────`);
+    items.forEach(it=>{
+      lines.push(`${it.qty}× ${it.name}   (${it.amt} 💋)`);
+    });
+    lines.push(`──────────────────────────────────`);
+    if(wish) lines.push(`★ Sonderwunsch: "${wish}"`);
+    lines.push(``);
+    lines.push(`Gesamt: ${totalQty} Stück · ${totalKisses} Küsse 💋`);
+    lines.push(``);
+    lines.push(`Mit Liebe bestellt von Pia ♥`);
+    const body = lines.join('\n');
+
+    if(WEB3FORMS_KEY && WEB3FORMS_KEY !== 'YOUR_ACCESS_KEY_HERE'){
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: subject,
+          from_name: "Pia's Toast Atelier",
+          message: body
+        })
+      }).then(r => r.json()).then(d => {
+        if(!d.success) console.warn('Web3Forms:', d);
+      }).catch(e => console.error('Web3Forms failed', e));
+    } else {
+      console.warn('Web3Forms key not set — order not sent. See WEB3FORMS_KEY in source.');
+    }
+  } catch(e){ console.error('order email failed', e); }
+}
+
+function renderSteps(){
+  document.getElementById('stepsList').innerHTML=stepsData.map((s,i)=>
+    `<li class="step ${s.done?'done':''}" onclick="toggleStep(${i})"><div class="s-cb">${s.done?'✓':''}</div><span class="s-ico">${s.e}</span><span class="s-txt">${s.t}</span></li>`).join('');
+  const done=stepsData.filter(s=>s.done).length,total=stepsData.length,pct=total?Math.round(done/total*100):0;
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=`${done} / ${total}`;
+  document.getElementById('pPct').textContent=pct+'%';
+}
+function toggleStep(i){
+  stepsData[i].done=!stepsData[i].done;renderSteps();
+  if(stepsData.every(s=>s.done)){setTimeout(()=>{document.getElementById('doneTxt').textContent='Alles fertig — Guten Appetit, Pia! ♡';document.getElementById('doneCard').style.display='block';window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});},400);}
+}
+function resetAll(){
+  CATS.forEach(c=>{idx[c]=0;renderSlot(c);});
+  qty=1;coffee=false;lockedToasts=[];stepsData=[];
+  document.getElementById('qtyVal').textContent='1';
+  const chk=document.getElementById('coffeeChk');chk.classList.remove('on');chk.textContent='';
+  document.getElementById('coffeeWrap').style.display='none';
+  document.getElementById('wishField').value='';
+  document.getElementById('lockBtn').textContent='+ Weiteren Toast konfigurieren';
+  renderShelf();drawToast();updName();
+  document.getElementById('orderView').classList.remove('hide');
+  document.getElementById('cookView').classList.remove('show');
+  document.getElementById('doneCard').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+CATS.forEach(c=>renderSlot(c));
+drawToast();updName();
+</script>
+</body>
+</html>
